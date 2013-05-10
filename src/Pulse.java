@@ -29,14 +29,11 @@ public class Pulse {
 	public void update(float ellapsedTime)
 	{
 		this.m_LifeTime -= ellapsedTime * 1000;
-		System.out.println("time " + ellapsedTime * 1000);
 		
 		if (this.m_LifeTime > 0 && this.m_Alpha > 0)
 		{
 			this.grow(ellapsedTime);
 			this.fade(ellapsedTime);
-			System.out.println("lifetime " + this.m_LifeTime);
-			System.out.println("alpha" + this.m_Alpha);
 		} else
 		{		
 			this.m_Alpha = 0;

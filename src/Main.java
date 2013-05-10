@@ -12,10 +12,10 @@ public class Main extends PApplet
 	public static final int FRAMERATE = 60;
 	public static final int WIDTH = 1370;
 	public static final int HEIGHT = 700;
-	public static final int NUMBER_OF_SOUNDS = 1;
+	public static final int NUMBER_OF_SOUNDS = 2;
 
-	public static final String LEGEND_IMAGE = "COLORS.png";
-	public static final String TITLE_IMAGE = "title.png";
+	public static final String LEGEND_IMAGE = "Images\\COLORS.png";
+	public static final String TITLE_IMAGE = "Images\\title.png";
 
 	public static final Color BACKGROUND_COLOR = new Color(69, 70, 75, 200);
 	public static final Color BACKGROUND_STROKE_COLOR = new Color(83, 83, 86);
@@ -37,6 +37,8 @@ public class Main extends PApplet
 		size (WIDTH, HEIGHT, P2D);
 		frameRate(FRAMERATE);
 		ellipseMode(CENTER);
+		
+		
 
 		m_LegendImage = loadImage (LEGEND_IMAGE);
 		m_TitleImage = loadImage(TITLE_IMAGE);
