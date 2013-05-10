@@ -1,5 +1,5 @@
 import infrastructure.ManagedPApplet;
-import infrastructure.SoundManager;
+import infrastructure.Sound.SoundManager;
 import infrastructure.interfaces.IDrawable;
 import infrastructure.interfaces.IUpdateable;
 

@@ -1,5 +1,6 @@
 package infrastructure;
 
+import infrastructure.interfaces.IDeathListener;
 import infrastructure.interfaces.IDrawable;
 import infrastructure.interfaces.IUpdateable;
 
@@ -7,7 +8,7 @@ import java.util.ArrayList;
 
 import processing.core.PApplet;
 
-public class ManagedPApplet extends PApplet {
+public class ManagedPApplet extends PApplet implements IDeathListener {
 	
 
 	private final ArrayList<Component> m_ComponentsToAdd = new ArrayList<Component>();
@@ -99,6 +100,14 @@ public class ManagedPApplet extends PApplet {
 		}
 		
 		this.m_PrevDrawTime = currentTime;	
+	}
+
+
+	@Override
+	public void handleDeath(Object object) 
+	{
+		this.removeComponent((Component)object);
+		
 	}
 	
 }

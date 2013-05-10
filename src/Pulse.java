@@ -21,7 +21,7 @@ public class Pulse extends SelfRegisteringComponent {
 	private int m_fadePerSecond = 100;
 	private long m_Alpha = 192;
 	private boolean m_dead = false;
-	private final ArrayList<IDeathListener> m_DeathListeners = new ArrayList<IDeathListener>();
+//	private final ArrayList<IDeathListener> m_DeathListeners = new ArrayList<IDeathListener>();
 	
 	public Pulse(PVector i_Origin, float i_Diameter, Color i_Color, long i_LifeTime, Main i_Parent) 
 	{
@@ -45,11 +45,6 @@ public class Pulse extends SelfRegisteringComponent {
 		{		
 			this.die();			
 		}
-	}
-	
-	public void addDeathListener(IDeathListener i_DeathListener)
-	{
-		this.m_DeathListeners.add(i_DeathListener);
 	}
 	
 	public void draw(long elapsedTime)
