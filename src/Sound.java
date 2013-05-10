@@ -248,4 +248,9 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	{
 		this.m_Pulse = false;
 	}
+
+	public boolean isPlayingSound() {
+		
+		return this.m_currentAnimationTime > 0;
+	}
 }

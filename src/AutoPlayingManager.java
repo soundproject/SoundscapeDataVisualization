@@ -2,14 +2,20 @@ import infrastructure.ManagedPApplet;
 import infrastructure.SelfRegisteringComponent;
 
 
+/**
+ * Class that manages Demo Mode for visualization
+ * @author Gadi
+ *
+ */
 public class AutoPlayingManager extends SelfRegisteringComponent {
 	
 	// Timing settings for transitions between sounds
 	public static final int MINIMUM_TIME_BETWEEN_ACTIVATIONS = 3000;
 	public static final int MAXIMUM_TIME_BETWEEN_ACTIVATIONS = 4500;
-	public static final int MINIMUM_ACTIVATION_TIME = 1500;
-	public static final int MAXIMUM_ACTIVATION_TIME = 2500;
+	public static final int MINIMUM_ACTIVATION_TIME = 15000;
+	public static final int MAXIMUM_ACTIVATION_TIME = 25000;
 	
+	// need direct reference to Main parent to work with Sounds
 	private Main m_MainParent;
 	private long m_PlayingTime;
 	private long m_TimeToPlay;
@@ -17,6 +23,7 @@ public class AutoPlayingManager extends SelfRegisteringComponent {
 	private int m_TimeToStop;
 	private boolean m_Playing = false;
 	private int m_ActiveSoundIndex;
+	private long m_delayTime;
 
 	public AutoPlayingManager(Main i_Parent) 
 	{
@@ -24,7 +31,11 @@ public class AutoPlayingManager extends SelfRegisteringComponent {
 		
 		this.m_MainParent = i_Parent;		
 		
+		// Set initial wait time from starting Demo mode 
+		// to playing first sound
 		generateNewStopTime();
+		
+		this.m_delayTime = 2000;
 	}
 
 	private void generateNewStopTime() 
@@ -38,9 +49,8 @@ public class AutoPlayingManager extends SelfRegisteringComponent {
 	}
 
 	@Override
-	public void update(long ellapsedTime) {
-		
-		
+	public void update(long ellapsedTime) 
+	{				
 		// If a sound is playing
 		if (isPlaying())
 		{
@@ -48,10 +58,23 @@ public class AutoPlayingManager extends SelfRegisteringComponent {
 			this.m_PlayingTime += ellapsedTime;
 			
 			// check if need to stop playing:
-			 if (this.m_PlayingTime > this.m_TimeToPlay)
-			 {
-				 stopPlaying();
-			 }
+			if (this.m_PlayingTime > this.m_TimeToPlay)
+			{
+				stopPlaying();
+			}			
+			// If still supposed to play and no sound is playing
+			else if (!this.m_MainParent.getSounds()[this.m_ActiveSoundIndex].isPlayingSound())
+			{
+				this.m_delayTime -= ellapsedTime;
+				
+				// check if enough time has passed (delayTime)
+				if (this.m_delayTime < 0)
+				{
+					// trigger next sound and reset delayTime
+					this.m_MainParent.getSounds()[this.m_ActiveSoundIndex].activate();
+					this.m_delayTime = 2000;
+				}
+			}
 		}
 		else
 		{	
@@ -66,56 +89,60 @@ public class AutoPlayingManager extends SelfRegisteringComponent {
 		}		
 	}
 
-	private void selectNextSound() {
-
-		String SelectedSound = "";
-		
+	private void selectNextSound() 
+	{
+		// Move to next sound in Sounds - cycle back if needed
 		this.m_ActiveSoundIndex++;
 		this.m_ActiveSoundIndex %= this.m_MainParent.getSounds().length;
 		
+		// activate the sound and generate random playing time within defined values
 		Sound selectedSound = this.m_MainParent.getSounds()[this.m_ActiveSoundIndex];
 		selectedSound.activate();
 		generateNewPlayTime();
-		playSound(SelectedSound);
+		
+		// set playing flag and reset playing time counter
 		this.m_PlayingTime = 0;
 		this.m_Playing = true;
 		
 	}
 
-	private void playSound(String selectedSound) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	
-
-	private void stopPlaying() {
-		// TODO Auto-generated method stub
+	private void stopPlaying() 
+	{
 		generateNewStopTime();
 		this.m_StoppedTime = 0;
 		this.m_Playing = false;		
 		
 	}
 
-	private boolean isPlaying() {
-		// TODO Auto-generated method stub
+	/**
+	 * Return True if a sound is currently selected
+	 * @return True if a sound is currently selected
+	 */
+	public boolean isPlaying() 
+	{
 		return this.m_Playing;
 	}
 
 	@Override
 	public void draw(long ellapsedTime) {
-		// EMPTY - not drawable
-		
+
+		// Draw Demo Mode message - DEBUG ONLY
 		this.m_MainParent.fill(155);
 		this.m_MainParent.text("Demo Mode", this.m_MainParent.width / 2, 10);
 	}
 
+	/**
+	 * Deactivate the Demo Mode
+	 */
 	public void Deactivate() 
 	{		
 		this.setEnabled(false);
 		this.setVisible(false);
 	}
 
+	/**
+	 * Activate Demo Mode
+	 */
 	public void Activate() 
 	{		
 		this.setEnabled(true);
