@@ -8,9 +8,17 @@ import java.util.ArrayList;
 
 import processing.core.PApplet;
 
-public class ManagedPApplet extends PApplet implements IDeathListener {
+/**
+ * Utility class extending PApplet functionality
+ * by adding easier time tracking between draw or update cycles
+ * Also has methods for adding and removing components to be
+ * updated and drawn automatically as needed
+ * @author Gadi
+ *
+ */
+public class ManagedPApplet extends PApplet implements IDeathListener 
+{
 	
-
 	private final ArrayList<Component> m_ComponentsToAdd = new ArrayList<Component>();
 	private final ArrayList<Component> m_ComponentsToRemove = new ArrayList<Component>();
 	private final ArrayList<Component> m_Components = new ArrayList<Component>();
@@ -19,6 +27,7 @@ public class ManagedPApplet extends PApplet implements IDeathListener {
 	
 	/**
 	 * Add a new component to be automatically drawn and updated
+	 * Will only be added next update cycle in an orderly manner
 	 * @param i_Component drawable object to add
 	 */
 	public void addComponent(Component i_Component)
@@ -28,7 +37,8 @@ public class ManagedPApplet extends PApplet implements IDeathListener {
 
 	
 	/**
-	 * Removes a componentfrom list of automatically updated objects 
+	 * Removes a component from list of automatically updated objects.
+	 * Will only be removed on next update cycle in an orderly manner
 	 * @param i_Component updateable object to remove
 	 */
 	public void removeComponent(Component i_Component)
@@ -46,51 +56,38 @@ public class ManagedPApplet extends PApplet implements IDeathListener {
 	}
 	
 	public void pre()
-	{		
+	{	
+		// keep track of time
 		int currentTime = millis();
 		int ellapsedTime = currentTime - this.m_PrevUpdateTime;
 		
-		
+		// add and remove components as needed
+		// separated from addComponent to allow subclasses of Component
+		// to call addComponent at any time without 
+		// risking ConcurrentModificationException
 		addNewComponents();
 		removeComponents();
 		
+		// update all components if they are enabled
 		for (Component component : this.m_Components)
 		{
 			if (component.Enabled())
 			{
 				component.update(ellapsedTime);
 			}
-		}
-		
-		
+		}				
 		
 		this.m_PrevUpdateTime = currentTime;	
 	}
 	
-	private void removeComponents() {
-
-		for (Component component : this.m_ComponentsToRemove) {
-			this.m_Components.remove(component);		
-		}
-		
-		this.m_ComponentsToRemove.clear();
-	}
-
-	private void addNewComponents() {
-
-		for (Component component : this.m_ComponentsToAdd) {
-			this.m_Components.add(component);
-		}
-		
-		this.m_ComponentsToAdd.clear();
-		
-	}
-
+	@Override
 	public void draw()
 	{
+		// keep track of time
 		int currentTime = millis();
 		int elapsedTime = currentTime - this.m_PrevDrawTime;
 		
+		// draw all components if visible
 		for (Component component : this.m_Components)
 		{
 			if (component.Visible())
@@ -110,4 +107,39 @@ public class ManagedPApplet extends PApplet implements IDeathListener {
 		
 	}
 	
+	
+	/**
+	 * Removes all components flagged to be removed since last pass
+	 */
+	private void removeComponents() 
+	{
+		
+		// remove all components set to be removed in ComponentsToRemove
+		for (Component component : this.m_ComponentsToRemove) 
+		{
+			this.m_Components.remove(component);		
+		}
+		
+		// clear componentsToRemove list
+		this.m_ComponentsToRemove.clear();
+	}
+
+	/**
+	 * Adds all components flagged to be added since last pass
+	 */
+	private void addNewComponents() 
+	{
+
+		// Add all components set to be added in ComponentsToAdd
+		for (Component component : this.m_ComponentsToAdd) 
+		{
+			this.m_Components.add(component);
+		}
+
+		// clear componentsToAdd list
+		this.m_ComponentsToAdd.clear();
+		
+	}
+
+
 }

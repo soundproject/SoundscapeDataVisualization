@@ -1,5 +1,10 @@
 package infrastructure.interfaces;
 
+/**
+ * Updateable component
+ * @author Gadi
+ *
+ */
 public interface IUpdateable {
 	
 	/**

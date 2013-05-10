@@ -9,6 +9,11 @@ import java.util.ArrayList;
 import ddf.minim.AudioSample;
 import ddf.minim.Minim;
 
+/**
+ * SoundManager class wrapping Minim
+ * @author Gadi
+ *
+ */
 public class SoundManager extends SelfRegisteringComponent implements IDeathListener
 {
 	
@@ -24,21 +29,37 @@ public class SoundManager extends SelfRegisteringComponent implements IDeathList
 //		this.m_Parent = i_Parent;
 		this.m_Minim = new Minim(i_Parent);
 		this.m_Minim.debugOn();
+		
+		// disable parent calls to draw() and update()
 		this.setVisible(false);
 		this.setEnabled(false);
 	}
 	
+	/**
+	 * Loads and plays a sound sample.
+	 * File location must be relative to ./data/
+	 * @param i_FileName name of file to load
+	 * @return length of audio file in milliseconds
+	 */
 	public int loadAndPlaySound(String i_FileName)
 	{
+		// create sample
 		AudioSample sample = this.loadSample(i_FileName);
+		
+		// wrap in SoundByte and add to collection
 		SoundByte soundByte = new SoundByte(m_Parent, sample);
 		this.m_SoundBytes.add(soundByte);
+		
+		// register for death event
 		soundByte.addDeathListener(this);
-//		this.playSample(sample);
+
+		// trigger sound to play
 		soundByte.play();
+		
 		return sample.length();
 	}
 
+	// TODO: not used - remove
 	private void playSample(AudioSample sample) {
 		sample.trigger();
 		int length = sample.length();
@@ -46,13 +67,19 @@ public class SoundManager extends SelfRegisteringComponent implements IDeathList
 		this.m_TimeLeftToPlay = length;		
 	}
 
+	/**
+	 * Load AudioSample from file
+	 * @param i_FileName filename
+	 * @return Minim Audio sample from file
+	 */
 	private AudioSample loadSample(String i_FileName) 
 	{					
 		return this.m_Minim.loadSample(i_FileName);
 	}
 
 	@Override
-	public void update(long ellapsedTime) {
+	public void update(long ellapsedTime) 
+	{
 		// EMPTY - all work done by SoundByte
 		
 	}

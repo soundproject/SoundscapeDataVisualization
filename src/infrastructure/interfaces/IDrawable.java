@@ -1,5 +1,10 @@
 package infrastructure.interfaces;
 
+/**
+ * Drawable component
+ * @author Gadi
+ *
+ */
 public interface IDrawable {
 	
 	/**

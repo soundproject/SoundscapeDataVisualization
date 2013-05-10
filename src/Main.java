@@ -14,6 +14,11 @@ import processing.core.PVector;
 import processing.event.MouseEvent;
 
 
+/**
+ * Main class of Visualization
+ * @author Gadi
+ *
+ */
 public class Main extends ManagedPApplet 
 {
 
@@ -39,20 +44,21 @@ public class Main extends ManagedPApplet
 	public static final Color ACTIVE_COLOR = Color.orange.darker();
 
 // -------------- Preferences ---------------------------------------------------------------------------
-	
+
+	// General Services
+	protected SoundManager m_SoundManager;
+	protected TextArea m_TextArea;
+	protected PFont m_Font;	
+	protected Sound m_SelectedSound = null;
 
 	private Sound [] m_Sounds;
 	private PImage m_LegendImage;
 	private PImage m_TitleImage;
-	protected PFont m_Font;	
 	
-	protected Sound m_SelectedSound = null;
-	private AutoPlayingManager m_AutoPlayingManager;
 	private int m_IdleTime;
 	private int m_MaxIdleTime = 6500;
+	private AutoPlayingManager m_AutoPlayingManager;
 	
-	protected SoundManager m_SoundManager;
-	protected TextArea m_TextArea;
 
 	public void setup()
 	{
@@ -72,16 +78,19 @@ public class Main extends ManagedPApplet
 		m_Sounds = new Sound [NUMBER_OF_SOUNDS];
 		for (int i = 0; i < this.m_Sounds.length; i++)
 		{
-
-			m_Sounds [i] = new Sound (new PVector(random(0, WIDTH), random(0, HEIGHT)), 
-//									  new PVector(random(-15, 15), random (-15,15)), 
+			
+			// generate new random sound
+			// TODO: calculate sound parameters according to real info
+			m_Sounds [i] = new Sound (new PVector(random(0, WIDTH), random(0, HEIGHT)),  
 									  random(10,90), this, i);
 		}
 		
-		// Initialize the "Demo Mode" manager
+		// Initialize services
 		this.m_AutoPlayingManager = new AutoPlayingManager(this);
 		this.m_SoundManager = new SoundManager(this);
 		this.m_TextArea = new TextArea(this, 250, 100, new Point(WIDTH - 250, HEIGHT - 100));
+		
+		// register for mouseEvent
 		this.registerMethod("mouseEvent", this);
 	}
 	
@@ -97,13 +106,17 @@ public class Main extends ManagedPApplet
 		
 	}
 
+	/**
+	 * MouseEvent handler
+	 * @param e MouseEvent sent by Processing Framework to method
+	 */
 	public void mouseEvent(MouseEvent e)
 	{
 
 		// reset idle time if mouse event happened
 		this.m_IdleTime = 0;
 		
-		// disabled demo mode if needed
+		// disable demo mode if needed
 		if (this.m_AutoPlayingManager.Enabled())
 		{
 			this.m_AutoPlayingManager.Deactivate();
@@ -133,21 +146,21 @@ public class Main extends ManagedPApplet
 				this.m_AutoPlayingManager.Activate();
 			}
 		}
-		super.pre();
 		
+		super.pre();		
 	}
 	
 
 	public void draw()
 	{
-
+		
 		drawBackground(false);		
 		
 		super.draw();
 		
 		// draw title images
-		image(m_LegendImage, 10,530);
-//		image(m_TitleImage,10,20);
+//		image(m_LegendImage, 10,530);
+		image(m_TitleImage,10,20);
 		
 		// draw framerate
 		fill(255);
@@ -156,6 +169,10 @@ public class Main extends ManagedPApplet
 	}
 	
 	
+	/**
+	 * Draws the grey background
+	 * @param drawStrokes true for drawing diagonal strokes on background
+	 */
 	private void drawBackground(boolean drawStrokes) {
 		
 		background(BACKGROUND_COLOR.getRed(), BACKGROUND_COLOR.getGreen(), 
@@ -171,18 +188,28 @@ public class Main extends ManagedPApplet
 				line(0,row,row,0);
 			}
 		}
-	}
-
-	private ArrayList<Pulse> pulses = new ArrayList<Pulse>();	
+	}	
 	
+	@Override
 	public void mouseClicked (MouseEvent e)
 	{
 		this.m_AutoPlayingManager.setEnabled(!this.m_AutoPlayingManager.Enabled());
-//		this.m_TextArea.displayMessage("Test Message", new String[] {"Line 1", "Line 2"} ,2500);
 	}
 
 
-	static public void main(String[] passedArgs) {
+
+	/**
+	 * Returns list of sounds
+	 * @return list of sounds
+	 */
+	public Sound[] getSounds() 
+	{
+		
+		return this.m_Sounds;
+	}
+
+	static public void main(String[] passedArgs) 
+	{
 		String[] appletArgs = new String[] { "--full-screen", "--bgcolor=#666666", "--stop-color=#cccccc", "sketch_130421a" };
 		if (passedArgs != null) {
 			PApplet.main(concat(appletArgs, passedArgs));
@@ -190,11 +217,4 @@ public class Main extends ManagedPApplet
 			PApplet.main(appletArgs);
 		}
 	}
-
-	public Sound[] getSounds() {
-		// TODO Auto-generated method stub
-		
-		return this.m_Sounds;
-	}
-
 }

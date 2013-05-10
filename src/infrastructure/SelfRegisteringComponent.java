@@ -4,12 +4,8 @@ import infrastructure.interfaces.IDeathListener;
 
 import java.util.ArrayList;
 
-public abstract class SelfRegisteringComponent extends Component{
-	
-	protected boolean m_enabled = true;
-	protected boolean m_visible = true;
-	protected boolean m_alive = true;
-	protected final ArrayList<IDeathListener> m_DeathListeners = new ArrayList<IDeathListener>();
+public abstract class SelfRegisteringComponent extends Component 
+{
 	
 	/**
 	 * Creates a new Component and registers it with the parent
@@ -20,16 +16,13 @@ public abstract class SelfRegisteringComponent extends Component{
 	{
 		super(i_Parent);
 		
+		// add component to parent
 		this.m_Parent.addComponent(this);
+		
+		// set parent to listen for this components death
 		this.addDeathListener(this.m_Parent);
 	}
 
-	public void addDeathListener(IDeathListener i_Listener)
-	{
-		if (!this.m_DeathListeners.contains(i_Listener))
-		{
-			this.m_DeathListeners.add(i_Listener);
-		}
-	}
+
 
 }
