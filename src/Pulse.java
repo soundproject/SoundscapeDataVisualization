@@ -14,10 +14,11 @@ public class Pulse extends SelfRegisteringComponent {
 	private Main m_ParentApp;
 	private PVector m_Origin;
 	private float m_Diameter;
+	private float m_OriginalDiameter;
 	private Color m_Color;
 	private long m_LifeTime;
-	private int m_growthPerSecond = 100;
-	private int m_fadePerSecond = 50;
+	private int m_growthPerSecond = 120;
+	private int m_fadePerSecond = 100;
 	private long m_Alpha = 192;
 	private boolean m_dead = false;
 	private final ArrayList<IDeathListener> m_DeathListeners = new ArrayList<IDeathListener>();
@@ -27,6 +28,7 @@ public class Pulse extends SelfRegisteringComponent {
 		super(i_Parent);
 		this.m_Origin = i_Origin;
 		this.m_Diameter = i_Diameter;
+		this.m_OriginalDiameter = i_Diameter;
 		this.m_Color = i_Color;
 		this.m_LifeTime = i_LifeTime;
 		this.m_ParentApp = i_Parent;
@@ -71,7 +73,7 @@ public class Pulse extends SelfRegisteringComponent {
 	}
 
 	private void grow(float elapsedTime) {
-		this.m_Diameter += this.m_growthPerSecond * elapsedTime / 1000f;		
+		this.m_Diameter += this.m_growthPerSecond * elapsedTime / 1000f;				
 	}
 
 	
