@@ -41,6 +41,8 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 
 	private int m_spacingTime;
 	
+	private String m_SoundFileName = "Sounds\\Pomeranian.mp3";
+	
 
 	/**
 	 * @param i_xLocation
@@ -89,7 +91,7 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 		
 		if (this.m_mouseIsOn && !this.m_Pulse) //!this.m_active)
 		{
-			this.m_Pulse = !this.m_Pulse;
+			this.activate();
 		}
 		
 //		if (this.m_Pulse)
@@ -224,6 +226,7 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	public void activate()
 	{
 		this.m_Pulse = true;
+		this.m_Parent.m_SoundManager.loadAndPlaySound(this.m_SoundFileName);
 	}
 	
 	public void deactivate()

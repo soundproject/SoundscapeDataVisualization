@@ -1,4 +1,5 @@
 import infrastructure.ManagedPApplet;
+import infrastructure.SoundManager;
 import infrastructure.interfaces.IDrawable;
 import infrastructure.interfaces.IUpdateable;
 
@@ -48,6 +49,8 @@ public class Main extends ManagedPApplet
 	private AutoPlayingManager m_AutoPlayingManager;
 	private int m_IdleTime;
 	private int m_MaxIdleTime = 6500;
+	
+	protected SoundManager m_SoundManager;
 
 	public void setup()
 	{
@@ -75,6 +78,7 @@ public class Main extends ManagedPApplet
 		
 		// Initialize the "Demo Mode" manager
 		this.m_AutoPlayingManager = new AutoPlayingManager(this);
+		this.m_SoundManager = new SoundManager(this);
 		this.registerMethod("mouseEvent", this);
 	}
 	
@@ -171,6 +175,10 @@ public class Main extends ManagedPApplet
 	public void mouseClicked (MouseEvent e){
 		
 		this.m_AutoPlayingManager.setEnabled(!this.m_AutoPlayingManager.Enabled());
+		
+		
+		
+		
 //		for (int n =0; n < this.m_Sounds.length; n++)
 //		{
 //			m_Sounds [n].select();
