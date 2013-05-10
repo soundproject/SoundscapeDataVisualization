@@ -178,7 +178,7 @@ public class Main extends ManagedPApplet
 	public void mouseClicked (MouseEvent e)
 	{
 		this.m_AutoPlayingManager.setEnabled(!this.m_AutoPlayingManager.Enabled());
-		this.m_TextArea.displayMessage("Test Message", new String[] {"Line 1", "Line 2"} ,2500);
+//		this.m_TextArea.displayMessage("Test Message", new String[] {"Line 1", "Line 2"} ,2500);
 	}
 
 

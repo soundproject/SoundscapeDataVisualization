@@ -5,6 +5,7 @@ import infrastructure.interfaces.IDrawable;
 import infrastructure.interfaces.IUpdateable;
 
 import java.awt.Color;
+import java.io.File;
 import java.util.ArrayList;
 
 import processing.core.PFont;
@@ -17,7 +18,7 @@ import processing.event.MouseEvent;
  */
 public class Sound extends SelfRegisteringComponent implements IDeathListener
 {
-	public static final String[] WORDS = {"Trucks", "Birds", "Dog", "Cat", "Laughter", "Kids", "Rain", "Waves"};
+	public static final String[] WORDS = {"Truck", "Bird", "Dog", "Cat", "Laughter", "Rain", "Waves"};
 	
 	private Main m_Parent;
 	private PVector m_Origin;
@@ -70,9 +71,21 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 		
 		this.m_pleasantness = i;
 		this.m_Word = getRandomWord();
+		this.m_SoundFileName = getRandomSound();
+		System.out.println("Random Sound is " + m_SoundFileName);
 		
 	}
 	
+	private String getRandomSound() {
+		File baseDirectory = new File("..\\Data\\Sounds");
+		File directory = new File(baseDirectory, this.m_Word);
+		File[] files = directory.listFiles();
+		
+		System.out.println("Number of sounds: " + files.length);
+		
+		return "Sounds\\" + this.m_Word + "\\"  + files[(int)this.m_Parent.random(0, files.length - 1)].getName();
+	}
+
 	public void mouseEvent(MouseEvent e)
 	{
 
@@ -110,6 +123,7 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 		this.m_Parent.ellipse(this.m_Origin.x ,this.m_Origin.y ,m_Diameter,m_Diameter);
 		
 		// TODO: add glow
+		
 		
 	}
 
@@ -226,7 +240,8 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	public void activate()
 	{
 		this.m_Pulse = true;
-		this.m_Parent.m_SoundManager.loadAndPlaySound(this.m_SoundFileName);
+		this.m_Parent.m_SoundManager.loadAndPlaySound(getRandomSound());
+		this.m_Parent.m_TextArea.displayMessage(this.m_Word, new String[] {"Name: " + this.m_SoundFileName}, 3500);
 	}
 	
 	public void deactivate()

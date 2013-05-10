@@ -21,7 +21,7 @@ public class SoundManager extends SelfRegisteringComponent
 		super(i_Parent);
 //		this.m_Parent = i_Parent;
 		this.m_Minim = new Minim(i_Parent);
-		this.m_Minim.debugOn();
+//		this.m_Minim.debugOn();
 	}
 	
 	public void loadAndPlaySound(String i_FileName)
