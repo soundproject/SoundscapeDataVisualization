@@ -4,6 +4,7 @@ import infrastructure.interfaces.IDrawable;
 import infrastructure.interfaces.IUpdateable;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.util.ArrayList;
 
 import processing.core.PApplet;
@@ -51,6 +52,7 @@ public class Main extends ManagedPApplet
 	private int m_MaxIdleTime = 6500;
 	
 	protected SoundManager m_SoundManager;
+	protected TextArea m_TextArea;
 
 	public void setup()
 	{
@@ -79,6 +81,7 @@ public class Main extends ManagedPApplet
 		// Initialize the "Demo Mode" manager
 		this.m_AutoPlayingManager = new AutoPlayingManager(this);
 		this.m_SoundManager = new SoundManager(this);
+		this.m_TextArea = new TextArea(this, 250, 100, new Point(WIDTH - 250, HEIGHT - 100));
 		this.registerMethod("mouseEvent", this);
 	}
 	
@@ -172,20 +175,10 @@ public class Main extends ManagedPApplet
 
 	private ArrayList<Pulse> pulses = new ArrayList<Pulse>();	
 	
-	public void mouseClicked (MouseEvent e){
-		
+	public void mouseClicked (MouseEvent e)
+	{
 		this.m_AutoPlayingManager.setEnabled(!this.m_AutoPlayingManager.Enabled());
-		
-		
-		
-		
-//		for (int n =0; n < this.m_Sounds.length; n++)
-//		{
-//			m_Sounds [n].select();
-//		}
-//		System.out.println("hi");
-//		System.out.println("Origin is " + mouseX + "," + mouseY);
-//		this.pulses.add(new Pulse(new PVector(mouseX, mouseY), 30f, Main.ACTIVE_COLOR, 3500, this));
+		this.m_TextArea.displayMessage("Test Message", new String[] {"Line 1", "Line 2"} ,2500);
 	}
 
 
