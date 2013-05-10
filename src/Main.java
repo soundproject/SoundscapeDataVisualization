@@ -1,3 +1,7 @@
+import infrastructure.ManagedPApplet;
+import infrastructure.interfaces.IDrawable;
+import infrastructure.interfaces.IUpdateable;
+
 import java.awt.Color;
 import java.util.ArrayList;
 
@@ -8,49 +12,66 @@ import processing.core.PVector;
 import processing.event.MouseEvent;
 
 
-public class Main extends PApplet 
+public class Main extends ManagedPApplet 
 {
+
+// -------------- Preferences ---------------------------------------------------------------------------
+	// general graphics options
 	public static final int FRAMERATE = 60;
 	public static final int WIDTH = 1370;
 	public static final int HEIGHT = 700;
-	public static final int NUMBER_OF_SOUNDS = 15;
 
+	// resource locations (base path is ./data/)
 	public static final String LEGEND_IMAGE = "Images\\COLORS.png";
 	public static final String TITLE_IMAGE = "Images\\title.png";
+	
+	// number of sounds
+	public static final int NUMBER_OF_SOUNDS = 1;
 
+	// Colors:
 	public static final Color BACKGROUND_COLOR = new Color(69, 70, 75, 200);
-	public static final Color BACKGROUND_STROKE_COLOR = new Color(83, 83, 86);
-	
+	public static final Color BACKGROUND_STROKE_COLOR = new Color(83, 83, 86);	
 	public static final Color PLEASANT_COLOR = new Color(13, 0, 202);
-	public static final Color UNPLEASANT_COLOR = new Color(250, 20, 202);
-	
+	public static final Color UNPLEASANT_COLOR = new Color(250, 20, 202);	
 	public static final Color INACTIVE_COLOR = new Color(128, 128, 128);
 	public static final Color ACTIVE_COLOR = Color.orange.darker();
+	
+	// Timing settings for transitions between sounds
+	public static final int MINIMUM_TIME_BETWEEN_ACTIVATIONS = 3000;
+	public static final int MAXIMUM_TIME_BETWEEN_ACTIVATIONS = 4500;
+	public static final int MINIMUM_ACTIVATION_TIME = 1500;
+	public static final int MAXIMUM_ACTIVATION_TIME = 2500;
+
+// -------------- Preferences ---------------------------------------------------------------------------
+	
 
 	private Sound [] m_Sounds;
 	private PImage m_LegendImage;
 	private PImage m_TitleImage;
 	private PFont m_Font;
 	
+
+	
 	protected Sound m_SelectedSound = null;
 
 	public void setup()
 	{
+		super.setup();
+		
+//		// register for events:
+//		this.registerMethod("pre", this);
+		
+		// set size and framerate
 		size (WIDTH, HEIGHT);
 		frameRate(FRAMERATE);
+		
+		this.loadContent();
+		
+		// set graphics options
 		ellipseMode(CENTER);		
 
-		m_LegendImage = loadImage (LEGEND_IMAGE);
-		m_TitleImage = loadImage(TITLE_IMAGE);
-		m_Font = createFont("Georgia", 18);
-		textFont(m_Font);
-
+		// initialize Sound Elements:
 		m_Sounds = new Sound [NUMBER_OF_SOUNDS];
-		
-		float redStep = (UNPLEASANT_COLOR.getRed() - PLEASANT_COLOR.getRed()) / this.m_Sounds.length;
-		float greenStep = (UNPLEASANT_COLOR.getGreen() - PLEASANT_COLOR.getGreen()) / this.m_Sounds.length;
-		float blueStep = (UNPLEASANT_COLOR.getBlue() - PLEASANT_COLOR.getBlue()) / this.m_Sounds.length;
-		
 		for (int i = 0; i < this.m_Sounds.length; i++)
 		{
 
@@ -59,10 +80,20 @@ public class Main extends PApplet
 									  random(10,90), this, i);
 		}
 		
-		this.registerMethod("pre", this);
-//		this.registerMethod("mouseEvent", this);
 	}
 	
+	private void loadContent() {
+		
+		// load images:
+		m_LegendImage = loadImage (LEGEND_IMAGE);
+		m_TitleImage = loadImage(TITLE_IMAGE);
+		
+		// load font
+		m_Font = createFont("Georgia", 18);
+		textFont(m_Font);
+		
+	}
+
 	public void mouseEvent(MouseEvent e)
 	{
 
@@ -78,16 +109,17 @@ public class Main extends PApplet
 	
 	public void pre()
 	{
+		super.pre();
 		long ellapsedTime = millis() - m_prevUpdateTime;
 		
-		for (Pulse pulse : pulses) {
-			pulse.update(ellapsedTime / 1000f);
-		}
+//		for (Pulse pulse : pulses) {
+//			pulse.update(ellapsedTime / 1000f);
+//		}
 		
-		for (Sound sound : this.m_Sounds)
-		{
-			sound.pre(ellapsedTime);
-		}
+//		for (Sound sound : this.m_Sounds)
+//		{
+//			sound.update(ellapsedTime);
+//		}
 		
 		m_prevUpdateTime = millis();
 	}
@@ -102,15 +134,12 @@ public class Main extends PApplet
 //		clear();
 		drawBackground();				
 		
-		for (Pulse pulse : pulses) {
-			
-			pulse.draw(ellapsedTime / 1000f);
-		}
+//		for (Pulse pulse : pulses) {
+//			
+//			pulse.draw(ellapsedTime / 1000f);
+//		}
 		
-		for (Sound sound : this.m_Sounds)
-		{
-			sound.draw();
-		}
+		super.draw();
 		
 		// draw title images
 		image(m_LegendImage, 10,530);

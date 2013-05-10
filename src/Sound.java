@@ -1,17 +1,21 @@
+import infrastructure.ManagedPApplet;
+import infrastructure.SelfRegisteringComponent;
+import infrastructure.interfaces.IDeathListener;
+import infrastructure.interfaces.IDrawable;
+import infrastructure.interfaces.IUpdateable;
+
 import java.awt.Color;
 import java.util.ArrayList;
 
-import processing.event.MouseEvent;
-
-import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PVector;
+import processing.event.MouseEvent;
 
 /**
  * @author Gadi
  *
  */
-public class Sound
+public class Sound extends SelfRegisteringComponent implements IDeathListener
 {
 	public static final String[] WORDS = {"Trucks", "Birds", "Dog", "Cat", "Laughter", "Kids", "Rain", "Waves"};
 	
@@ -19,7 +23,6 @@ public class Sound
 	private PVector m_Origin;
 //	private PVector m_Velocity;
 	private Color m_Color;
-	private PFont font;
 	private String m_Word;
 
 	private float m_Diameter;
@@ -29,13 +32,12 @@ public class Sound
 
 	private boolean m_pulse = false;
 	private int m_pulseAlpha = 196;
-	private int m_numberOfPulses = 4;
+	private int m_numberOfPulses = 8;
 	private int m_spacing = 500;
-	private long m_prevTime;
-	private long m_totalAnimationTime = 3500;
+	private long m_totalAnimationTime = 4000;
 	private long m_currentAnimationTime = 0;
 	
-	private ArrayList<Pulse> m_Pulses = new ArrayList<Pulse>();
+	private int m_Pulses = 0;
 
 	private int m_spacingTime;
 	
@@ -45,26 +47,22 @@ public class Sound
 	 * @param i_yLocation
 	 * @param i_speedx
 	 * @param i_speedy
-	 * @param i_diameter
-	 * @param parent
+	 * @param i_Diameter
+	 * @param i_Parent
 	 * @param i
 	 */
-	Sound(PVector i_Origin, float i_diameter, Main parent, int i)
+	Sound(PVector i_Origin, float i_Diameter, Main i_Parent, int i)
 	{
-		
+		super(i_Parent);
 		this.m_Origin = i_Origin;
 
-		m_Diameter = i_diameter;
+		m_Diameter = i_Diameter;
 		
 //		this.m_Velocity = PVector.div(i_Velocity, 5f);
 
-		this.m_Parent = parent;
-//		this.m_Parent.registerMethod("draw", this);
-//		this.m_Parent.registerMethod("pre", this);
+		this.m_Parent = i_Parent;
+
 		this.m_Parent.registerMethod("mouseEvent", this);
-		
-//		font = this.m_Parent.createFont("Georgia", 24);
-//		this.m_Parent.textFont(font);
 		
 		this.m_Color = Main.INACTIVE_COLOR;
 		
@@ -84,12 +82,6 @@ public class Sound
 			default:
 				break;
 		}
-
-	}
-
-	private void handleMouseMove(MouseEvent e) {
-		// TODO Auto-generated method stub
-
 
 	}
 
@@ -119,61 +111,35 @@ public class Sound
 		
 	}
 
-	public void pre(float ellapsedTime)
+	public void update(long ellapsedTime)
 	{
+		// Check if mouse is hovering on circle:
 		isMouseOn();
 		
-//		if (this.m_active)
-//		{			
-//			this.move();
-//		}
+		// update color of circle if mouse is on the circle
+		this.m_Color = this.m_mouseIsOn ? Main.ACTIVE_COLOR.brighter() : Main.INACTIVE_COLOR;
 		
+		// Pulse if needed
 		if (this.m_pulse)
 		{
-			if (this.m_Pulses.size() <= this.m_numberOfPulses && this.m_spacingTime >= this.m_spacing)
+			this.m_currentAnimationTime += ellapsedTime;
+			if (this.m_Pulses < this.m_numberOfPulses && this.m_spacingTime >= this.m_spacing)
 			{
-				this.m_Pulses.add(new Pulse(m_Origin, this.m_Diameter, Main.ACTIVE_COLOR, 3500, this.m_Parent));
+				this.m_Pulses++;
+				new Pulse(m_Origin, this.m_Diameter, Main.ACTIVE_COLOR, 3500, this.m_Parent).addDeathListener(this);
+				System.out.println("Pulse Added" + this.m_Pulses);
 				this.m_spacingTime = 0;
-//				this.m_spacing *= 0.9f;
 			} else
 			{
 				this.m_spacingTime += ellapsedTime;
 			}
-		
-			int deadPulses = 0;
-			for (Pulse pulse : this.m_Pulses) {
-				if (!pulse.isDead())
-					pulse.update(ellapsedTime / 1000f);
-				else 
-					deadPulses++;
-			}
-			if (deadPulses == this.m_numberOfPulses)
+
+			if (this.m_currentAnimationTime >= this.m_totalAnimationTime)
 			{
 				this.m_pulse = false;
-				this.m_Pulses.clear();
 			}
-		} 
+		} 						
 		
-		
-		
-		
-		this.m_Color = this.m_mouseIsOn ? Main.ACTIVE_COLOR : Main.INACTIVE_COLOR;
-
-		
-		
-//		if (this.m_pulse && this.m_currentAnimationTime < this.m_totalAnimationTime)
-//		{
-////			long ellapsedTime = (this.m_Parent.millis() - this.m_prevTime);
-//			this.m_currentAnimationTime += ellapsedTime;
-//			this.m_pulseAlpha -= (192f) / (this.m_totalAnimationTime) * ellapsedTime;
-//		} else
-//		{
-//			this.m_pulse = false;
-//			this.m_pulseAlpha = 192;
-//			this.m_currentAnimationTime = 0;
-//		}
-//		
-//		this.m_prevTime = this.m_Parent.millis();
 		
 	}
 
@@ -224,7 +190,7 @@ public class Sound
 //		}
 	}
 
-	public void draw()
+	public void draw(long ellapsedTime)
 	{
 		
 		// draw shape
@@ -239,18 +205,19 @@ public class Sound
 			this.select();
 		}
 		
+		// pulse?
 		if (this.m_pulse)
 		{
 //			this.m_Parent.stroke(this.m_Color.getRGB(), this.m_pulseAlpha);
 //			this.m_Parent.ellipse(this.m_Origin.x ,this.m_Origin.y ,m_Diameter + (192 - this.m_pulseAlpha),m_Diameter + (192 - this.m_pulseAlpha));
-			for (Pulse pulse : this.m_Pulses) {
-				if (!pulse.isDead())
-					pulse.draw(0.1f);
+//			for (Pulse pulse : this.m_Pulses) {
+//				if (!pulse.isDead())
+//					pulse.draw(ellapsedTime);
 //				else
 //				{
 //					System.out.println("dead pulse found");
 //				}
-			}
+//			}
 		}
 		
 //		if (!this.m_active)
@@ -287,5 +254,12 @@ public class Sound
 	{
 		
 		return WORDS[(int)(this.m_Parent.random(0, WORDS.length - 1))];
+	}
+
+	@Override
+	public void handleDeath(Object object) {
+		
+		this.m_Pulses--;
+		System.out.println("Pulse died" + this.m_Pulses);
 	}
 }
