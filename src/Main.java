@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import processing.core.PApplet;
+import processing.core.PFont;
 import processing.core.PImage;
 import processing.core.PVector;
 import processing.event.MouseEvent;
@@ -12,7 +13,7 @@ public class Main extends PApplet
 	public static final int FRAMERATE = 60;
 	public static final int WIDTH = 1370;
 	public static final int HEIGHT = 700;
-	public static final int NUMBER_OF_SOUNDS = 2;
+	public static final int NUMBER_OF_SOUNDS = 15;
 
 	public static final String LEGEND_IMAGE = "Images\\COLORS.png";
 	public static final String TITLE_IMAGE = "Images\\title.png";
@@ -29,19 +30,20 @@ public class Main extends PApplet
 	private Sound [] m_Sounds;
 	private PImage m_LegendImage;
 	private PImage m_TitleImage;
+	private PFont m_Font;
 	
 	protected Sound m_SelectedSound = null;
 
 	public void setup()
 	{
-		size (WIDTH, HEIGHT, P2D);
+		size (WIDTH, HEIGHT);
 		frameRate(FRAMERATE);
-		ellipseMode(CENTER);
-		
-		
+		ellipseMode(CENTER);		
 
 		m_LegendImage = loadImage (LEGEND_IMAGE);
 		m_TitleImage = loadImage(TITLE_IMAGE);
+		m_Font = createFont("Georgia", 18);
+		textFont(m_Font);
 
 		m_Sounds = new Sound [NUMBER_OF_SOUNDS];
 		
@@ -97,7 +99,7 @@ public class Main extends PApplet
 	public void draw()
 	{
 		long ellapsedTime = millis() - m_prevDrawTime; 
-		clear();
+//		clear();
 		drawBackground();				
 		
 		for (Pulse pulse : pulses) {
@@ -111,8 +113,14 @@ public class Main extends PApplet
 		}
 		
 		// draw title images
-		image (m_LegendImage, 10,530);
-		image (m_TitleImage,10,20);
+		image(m_LegendImage, 10,530);
+//		image(m_TitleImage,10,20);
+		
+		// draw framerate
+		fill(255);
+		textAlign(LEFT, TOP);
+		text(frameRate, 10, 10);
+		
 		
 		m_prevDrawTime = millis();
 	}

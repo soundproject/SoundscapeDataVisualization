@@ -38,7 +38,6 @@ public class Pulse {
 		{		
 			this.m_Alpha = 0;
 			this.m_dead = true;
-			System.out.println("died");
 		}
 	}
 	

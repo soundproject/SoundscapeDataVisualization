@@ -55,7 +55,6 @@ public class Sound
 		this.m_Origin = i_Origin;
 
 		m_Diameter = i_diameter;
-
 		
 //		this.m_Velocity = PVector.div(i_Velocity, 5f);
 
@@ -64,8 +63,8 @@ public class Sound
 //		this.m_Parent.registerMethod("pre", this);
 		this.m_Parent.registerMethod("mouseEvent", this);
 		
-		font = this.m_Parent.createFont("Georgia", 24);
-		this.m_Parent.textFont(font);
+//		font = this.m_Parent.createFont("Georgia", 24);
+//		this.m_Parent.textFont(font);
 		
 		this.m_Color = Main.INACTIVE_COLOR;
 		
@@ -135,7 +134,7 @@ public class Sound
 			{
 				this.m_Pulses.add(new Pulse(m_Origin, this.m_Diameter, Main.ACTIVE_COLOR, 3500, this.m_Parent));
 				this.m_spacingTime = 0;
-				System.out.println("new");
+//				this.m_spacing *= 0.9f;
 			} else
 			{
 				this.m_spacingTime += ellapsedTime;
@@ -151,6 +150,7 @@ public class Sound
 			if (deadPulses == this.m_numberOfPulses)
 			{
 				this.m_pulse = false;
+				this.m_Pulses.clear();
 			}
 		} 
 		
@@ -246,41 +246,41 @@ public class Sound
 			for (Pulse pulse : this.m_Pulses) {
 				if (!pulse.isDead())
 					pulse.draw(0.1f);
-				else
-				{
-					System.out.println("dead pulse found");
-				}
+//				else
+//				{
+//					System.out.println("dead pulse found");
+//				}
 			}
 		}
 		
-		if (!this.m_active)
-		{
-			this.m_Parent.fill(255);
-			this.m_Parent.noStroke();
-			int width = (int) Math.max((this.m_Parent.textWidth("Total: 24") + 10), (this.m_Parent.textWidth("Unpleasant: 89%") + 10));
-			int height = 24 * 3 + 15;
-			int x = (int) (this.m_Origin.x - width / 2);
-			int y = (int) (this.m_Origin.y - this.m_Diameter /2 - height - 3);
-			this.m_Parent.rect(x, y, width, height, 7);
-
-			this.m_Parent.textAlign(this.m_Parent.CENTER, this.m_Parent.TOP);
-			
-			this.m_Parent.fill(128);
-			this.m_Parent.text(this.m_Word, x + width / 2, y);
-			this.m_Parent.textAlign(this.m_Parent.LEFT, this.m_Parent.TOP);
-			this.m_Parent.text("Total: " + (int)this.m_Diameter, x + 5, y + 24);
-			
-			String message = this.m_pleasantness <= 50? "Pleasant ": "Unpleasant ";
-			int pleasant = this.m_pleasantness;
-			if (this.m_pleasantness <= 50)
-			{
-				pleasant = 100 - (this.m_pleasantness * 2);
-			}
-			message += pleasant + "%";
-			
-			this.m_Parent.text(message, x + 5, y + 24 * 2);
-			
-		}
+//		if (!this.m_active)
+//		{
+//			this.m_Parent.fill(255);
+//			this.m_Parent.noStroke();
+//			int width = (int) Math.max((this.m_Parent.textWidth("Total: 24") + 10), (this.m_Parent.textWidth("Unpleasant: 89%") + 10));
+//			int height = 24 * 3 + 15;
+//			int x = (int) (this.m_Origin.x - width / 2);
+//			int y = (int) (this.m_Origin.y - this.m_Diameter /2 - height - 3);
+//			this.m_Parent.rect(x, y, width, height, 7);
+//
+//			this.m_Parent.textAlign(this.m_Parent.CENTER, this.m_Parent.TOP);
+//			
+//			this.m_Parent.fill(128);
+//			this.m_Parent.text(this.m_Word, x + width / 2, y);
+//			this.m_Parent.textAlign(this.m_Parent.LEFT, this.m_Parent.TOP);
+//			this.m_Parent.text("Total: " + (int)this.m_Diameter, x + 5, y + 24);
+//			
+//			String message = this.m_pleasantness <= 50? "Pleasant ": "Unpleasant ";
+//			int pleasant = this.m_pleasantness;
+//			if (this.m_pleasantness <= 50)
+//			{
+//				pleasant = 100 - (this.m_pleasantness * 2);
+//			}
+//			message += pleasant + "%";
+//			
+//			this.m_Parent.text(message, x + 5, y + 24 * 2);
+//			
+//		}
 	}
 	
 	private String getRandomWord()
