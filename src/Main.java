@@ -26,7 +26,7 @@ public class Main extends ManagedPApplet
 	public static final String TITLE_IMAGE = "Images\\title.png";
 	
 	// number of sounds
-	public static final int NUMBER_OF_SOUNDS = 1;
+	public static final int NUMBER_OF_SOUNDS = 30;
 
 	// Colors:
 	public static final Color BACKGROUND_COLOR = new Color(69, 70, 75, 200);
@@ -35,12 +35,6 @@ public class Main extends ManagedPApplet
 	public static final Color UNPLEASANT_COLOR = new Color(250, 20, 202);	
 	public static final Color INACTIVE_COLOR = new Color(128, 128, 128);
 	public static final Color ACTIVE_COLOR = Color.orange.darker();
-	
-	// Timing settings for transitions between sounds
-	public static final int MINIMUM_TIME_BETWEEN_ACTIVATIONS = 3000;
-	public static final int MAXIMUM_TIME_BETWEEN_ACTIVATIONS = 4500;
-	public static final int MINIMUM_ACTIVATION_TIME = 1500;
-	public static final int MAXIMUM_ACTIVATION_TIME = 2500;
 
 // -------------- Preferences ---------------------------------------------------------------------------
 	
@@ -48,23 +42,22 @@ public class Main extends ManagedPApplet
 	private Sound [] m_Sounds;
 	private PImage m_LegendImage;
 	private PImage m_TitleImage;
-	private PFont m_Font;
-	
-
+	protected PFont m_Font;	
 	
 	protected Sound m_SelectedSound = null;
+	private AutoPlayingManager m_AutoPlayingManager;
+	private int m_IdleTime;
+	private int m_MaxIdleTime = 6500;
 
 	public void setup()
 	{
 		super.setup();
 		
-//		// register for events:
-//		this.registerMethod("pre", this);
-		
 		// set size and framerate
 		size (WIDTH, HEIGHT);
 		frameRate(FRAMERATE);
 		
+		// load images, fonts, sounds...
 		this.loadContent();
 		
 		// set graphics options
@@ -80,6 +73,9 @@ public class Main extends ManagedPApplet
 									  random(10,90), this, i);
 		}
 		
+		// Initialize the "Demo Mode" manager
+		this.m_AutoPlayingManager = new AutoPlayingManager(this);
+		this.registerMethod("mouseEvent", this);
 	}
 	
 	private void loadContent() {
@@ -97,47 +93,48 @@ public class Main extends ManagedPApplet
 	public void mouseEvent(MouseEvent e)
 	{
 
+		// reset idle time if mouse event happened
+		this.m_IdleTime = 0;
+		
+		// disabled demo mode if needed
+		if (this.m_AutoPlayingManager.Enabled())
+		{
+			this.m_AutoPlayingManager.Deactivate();
+		}
+				
+		// handle mouse event
 		switch (e.getAction()) {
 			case MouseEvent.CLICK:
 				this.mouseClicked(e);
 				break;
 			default:
 				break;
+		}		
+	}
+	
+	@Override
+	public void pre() {
+
+		// if demo mode is not enabled, aggregate idleTime
+		if (!this.m_AutoPlayingManager.Enabled())
+		{
+			this.m_IdleTime += (millis() - this.m_PrevUpdateTime);
+		
+			// Activate demo mode if max idle time reached
+			if (this.m_IdleTime >= this.m_MaxIdleTime)
+			{
+				this.m_AutoPlayingManager.Activate();
+			}
 		}
-
-	}
-	
-	public void pre()
-	{
 		super.pre();
-		long ellapsedTime = millis() - m_prevUpdateTime;
 		
-//		for (Pulse pulse : pulses) {
-//			pulse.update(ellapsedTime / 1000f);
-//		}
-		
-//		for (Sound sound : this.m_Sounds)
-//		{
-//			sound.update(ellapsedTime);
-//		}
-		
-		m_prevUpdateTime = millis();
 	}
 	
-	private long m_prevDrawTime;
-	private long m_prevUpdateTime;
-
 
 	public void draw()
 	{
-		long ellapsedTime = millis() - m_prevDrawTime; 
-//		clear();
-		drawBackground();				
-		
-//		for (Pulse pulse : pulses) {
-//			
-//			pulse.draw(ellapsedTime / 1000f);
-//		}
+
+		drawBackground(false);		
 		
 		super.draw();
 		
@@ -149,29 +146,31 @@ public class Main extends ManagedPApplet
 		fill(255);
 		textAlign(LEFT, TOP);
 		text(frameRate, 10, 10);
-		
-		
-		m_prevDrawTime = millis();
 	}
 	
 	
-	private void drawBackground() {
+	private void drawBackground(boolean drawStrokes) {
 		
 		background(BACKGROUND_COLOR.getRed(), BACKGROUND_COLOR.getGreen(), 
 				BACKGROUND_COLOR.getBlue(), BACKGROUND_COLOR.getAlpha());
 
-//		for (int row=0; row<5000; row=row+20)
-//		{
-//			stroke(BACKGROUND_STROKE_COLOR.getRed(), BACKGROUND_STROKE_COLOR.getGreen(), 
-//					BACKGROUND_STROKE_COLOR.getBlue());
-//			strokeWeight(1);
-//			line(0,row,row,0);
-//		}
+		if (drawStrokes)
+		{
+			for (int row=0; row<5000; row=row+20)
+			{
+				stroke(BACKGROUND_STROKE_COLOR.getRed(), BACKGROUND_STROKE_COLOR.getGreen(), 
+						BACKGROUND_STROKE_COLOR.getBlue());
+				strokeWeight(1);
+				line(0,row,row,0);
+			}
+		}
 	}
 
 	private ArrayList<Pulse> pulses = new ArrayList<Pulse>();	
 	
 	public void mouseClicked (MouseEvent e){
+		
+		this.m_AutoPlayingManager.setEnabled(!this.m_AutoPlayingManager.Enabled());
 //		for (int n =0; n < this.m_Sounds.length; n++)
 //		{
 //			m_Sounds [n].select();
@@ -189,6 +188,12 @@ public class Main extends ManagedPApplet
 		} else {
 			PApplet.main(appletArgs);
 		}
+	}
+
+	public Sound[] getSounds() {
+		// TODO Auto-generated method stub
+		
+		return this.m_Sounds;
 	}
 
 }

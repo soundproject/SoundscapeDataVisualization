@@ -30,10 +30,10 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	private boolean m_active = true;
 	private int m_pleasantness;
 
-	private boolean m_pulse = false;
-	private int m_pulseAlpha = 196;
+	private boolean m_Pulse = false;
+	private int m_PulseStartingAlpha = 196;
 	private int m_numberOfPulses = 8;
-	private int m_spacing = 500;
+	private int m_TimeBetweenPulses = 500;
 	private long m_totalAnimationTime = 4000;
 	private long m_currentAnimationTime = 0;
 	
@@ -87,15 +87,15 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 
 	private void handleMouseClick(MouseEvent e) {
 		
-		if (this.m_mouseIsOn || !this.m_active)
+		if (this.m_mouseIsOn && !this.m_Pulse) //!this.m_active)
 		{
-			this.m_active = !this.m_active;
+			this.m_Pulse = !this.m_Pulse;
 		}
 		
-		if (!this.m_active)
-		{
-			this.m_pulse = true;
-		}
+//		if (this.m_Pulse)
+//		{
+//			this.m_Pulse = true;
+//		}
 
 	}
 
@@ -120,14 +120,13 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 		this.m_Color = this.m_mouseIsOn ? Main.ACTIVE_COLOR.brighter() : Main.INACTIVE_COLOR;
 		
 		// Pulse if needed
-		if (this.m_pulse)
+		if (this.m_Pulse)
 		{
 			this.m_currentAnimationTime += ellapsedTime;
-			if (this.m_Pulses < this.m_numberOfPulses && this.m_spacingTime >= this.m_spacing)
+			if (this.m_Pulses < this.m_numberOfPulses && this.m_spacingTime >= this.m_TimeBetweenPulses)
 			{
 				this.m_Pulses++;
 				new Pulse(m_Origin, this.m_Diameter, Main.ACTIVE_COLOR, 3500, this.m_Parent).addDeathListener(this);
-				System.out.println("Pulse Added" + this.m_Pulses);
 				this.m_spacingTime = 0;
 			} else
 			{
@@ -136,7 +135,8 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 
 			if (this.m_currentAnimationTime >= this.m_totalAnimationTime)
 			{
-				this.m_pulse = false;
+				this.m_Pulse = false;
+				this.m_currentAnimationTime = 0;
 			}
 		} 						
 		
@@ -158,6 +158,8 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 			// check if this circle was selected
 			if (this.m_mouseIsOn && this.m_Parent.m_SelectedSound == this)
 			{
+				// if we are selected and mouse was on and not anymore
+				// update mouse status
 				this.m_mouseIsOn = false;
 
 				// notify parent we are no longer selected
@@ -169,7 +171,8 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 		return this.m_mouseIsOn;
 	}
 
-	private boolean isMouseOnCircle() {
+	private boolean isMouseOnCircle() 
+	{
 		
 		return Math.abs(this.m_Origin.x - this.m_Parent.mouseX) < this.m_Diameter / 2
 				&& Math.abs(this.m_Origin.y - this.m_Parent.mouseY) < this.m_Diameter / 2;
@@ -204,50 +207,6 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 		{
 			this.select();
 		}
-		
-		// pulse?
-		if (this.m_pulse)
-		{
-//			this.m_Parent.stroke(this.m_Color.getRGB(), this.m_pulseAlpha);
-//			this.m_Parent.ellipse(this.m_Origin.x ,this.m_Origin.y ,m_Diameter + (192 - this.m_pulseAlpha),m_Diameter + (192 - this.m_pulseAlpha));
-//			for (Pulse pulse : this.m_Pulses) {
-//				if (!pulse.isDead())
-//					pulse.draw(ellapsedTime);
-//				else
-//				{
-//					System.out.println("dead pulse found");
-//				}
-//			}
-		}
-		
-//		if (!this.m_active)
-//		{
-//			this.m_Parent.fill(255);
-//			this.m_Parent.noStroke();
-//			int width = (int) Math.max((this.m_Parent.textWidth("Total: 24") + 10), (this.m_Parent.textWidth("Unpleasant: 89%") + 10));
-//			int height = 24 * 3 + 15;
-//			int x = (int) (this.m_Origin.x - width / 2);
-//			int y = (int) (this.m_Origin.y - this.m_Diameter /2 - height - 3);
-//			this.m_Parent.rect(x, y, width, height, 7);
-//
-//			this.m_Parent.textAlign(this.m_Parent.CENTER, this.m_Parent.TOP);
-//			
-//			this.m_Parent.fill(128);
-//			this.m_Parent.text(this.m_Word, x + width / 2, y);
-//			this.m_Parent.textAlign(this.m_Parent.LEFT, this.m_Parent.TOP);
-//			this.m_Parent.text("Total: " + (int)this.m_Diameter, x + 5, y + 24);
-//			
-//			String message = this.m_pleasantness <= 50? "Pleasant ": "Unpleasant ";
-//			int pleasant = this.m_pleasantness;
-//			if (this.m_pleasantness <= 50)
-//			{
-//				pleasant = 100 - (this.m_pleasantness * 2);
-//			}
-//			message += pleasant + "%";
-//			
-//			this.m_Parent.text(message, x + 5, y + 24 * 2);
-//			
-//		}
 	}
 	
 	private String getRandomWord()
@@ -257,9 +216,18 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	}
 
 	@Override
-	public void handleDeath(Object object) {
-		
+	public void handleDeath(Object object) 
+	{		
 		this.m_Pulses--;
-		System.out.println("Pulse died" + this.m_Pulses);
+	}
+	
+	public void activate()
+	{
+		this.m_Pulse = true;
+	}
+	
+	public void deactivate()
+	{
+		this.m_Pulse = false;
 	}
 }

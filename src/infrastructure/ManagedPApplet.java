@@ -13,8 +13,8 @@ public class ManagedPApplet extends PApplet {
 	private final ArrayList<Component> m_ComponentsToAdd = new ArrayList<Component>();
 	private final ArrayList<Component> m_ComponentsToRemove = new ArrayList<Component>();
 	private final ArrayList<Component> m_Components = new ArrayList<Component>();
-	private int m_PrevUpdateTime;
-	private int m_PrevDrawTime;
+	protected int m_PrevUpdateTime;
+	protected int m_PrevDrawTime;
 	
 	/**
 	 * Add a new component to be automatically drawn and updated
