@@ -26,7 +26,7 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 {
 
 	private static final float MIN_ZOOM = 0.1f;
-	private static float MAX_ZOOM = 10f;
+	private static float MAX_ZOOM = 100f;
 
 	private static final boolean DEBUG = true;
 
@@ -50,6 +50,9 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 	private int m_ZoomBarHeight = 125;
 
 	private int m_ZoomBarBottom = 150;
+	private PVector m_PanDirection = new PVector(0, 0);
+	private float m_PanSpeed = 0;
+	private int m_PanningTime = 0;
 
 	
 	
@@ -88,23 +91,32 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 	{	
 		// keep track of time
 		int currentTime = millis();
-		int ellapsedTime = currentTime - this.m_PrevUpdateTime;
+		int elapsedTime = currentTime - this.m_PrevUpdateTime;
 		
 		// add and remove components as needed
 		// separated from addComponent to allow subclasses of Component
 		// to call addComponent at any time without 
 		// risking ConcurrentModificationException
 		addNewComponents();
-		removeComponents();		
+		removeComponents();
+		
+		// pan to target
+		if (this.m_PanningTime > 0)
+		{
+			this.m_PanningTime -= elapsedTime;
+			
+			this.m_WorldOrigin.add(PVector.mult(m_PanDirection, this.m_PanSpeed * 7));
+//			this.m_WorldOrigin.add(PVector.mult(m_PanDirection, this.m_PanSpeed));
+		}
 		
 		// update all components if they are enabled
 		for (Component component : this.m_Components)
 		{
 			if (component.Enabled())
 			{
-				component.update(ellapsedTime);
+				component.update(elapsedTime);
 			}
-		}				
+		}
 		
 		this.m_PrevUpdateTime = currentTime;	
 	}
@@ -122,7 +134,7 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		pushMatrix();
 		
 		// center on zoom target
-		this.translate(0, 0);
+//		this.translate(this.width / 2, this.height / 2);
 //		this.translate(this.m_CenterForZoom.x, this.m_CenterForZoom.y);
 		
 		// zoom in / out as needed
@@ -390,17 +402,43 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		}
 	}
 	
+	/**
+	 * Coordinates of mouse in world after accounting 
+	 * for zoom and translation of camera
+	 * @return world mouse coordinates
+	 */
 	public PVector getWorldMouse()
 	{
 		PVector result = new PVector((mouseX - this.m_WorldOrigin.x) / this.m_Zoom, (mouseY - this.m_WorldOrigin.y) / this.m_Zoom);
 		
-//		if (DEBUG)
-//		{
-//			System.out.println("Mouse world coordinates" + result);
-//			System.out.println("Actual mouse is on " + mouseX + " " + mouseY);
-//		}
-		
 		return result;
+	}
+	
+	public void centerViewOnTarget(PVector i_NewCenter, float i_ZoomFactor, int i_TimeForAnimation)
+	{
+		float left = i_NewCenter.x - (this.width / i_ZoomFactor);
+		float top = i_NewCenter.y - (this.height / i_ZoomFactor);
+//		PVector calculatedCenter = new PVector(left, top);
+//		if (i_ZoomFactor > 1)
+//		{
+//			i_ZoomFactor *= -1;
+//		}
+		PVector calculatedCenter = PVector.mult(i_NewCenter, i_ZoomFactor * -1);
+		this.m_PanDirection = PVector.sub(this.m_WorldOrigin, calculatedCenter);
+		this.m_PanSpeed = this.m_PanDirection.mag() / i_TimeForAnimation;
+		this.m_PanDirection.mult(-1);
+		this.m_PanDirection.normalize();
+		
+		this.m_PanningTime = i_TimeForAnimation;
+		
+		if (DEBUG)
+		{
+			System.out.println("Received new center: " + i_NewCenter);
+			System.out.println("Received new zoom: " + i_ZoomFactor);
+			System.out.println("Calculated center " + calculatedCenter);
+			System.out.println("Time to animate: " + i_TimeForAnimation);
+			System.out.println("Direction is " + this.m_PanDirection);
+		}
 	}
 
 

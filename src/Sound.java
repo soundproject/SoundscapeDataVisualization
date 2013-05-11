@@ -95,7 +95,6 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	{
 		switch (e.getAction()) {
 			case MouseEvent.CLICK:
-
 				handleMouseClick(e);
 				break;
 			default:
@@ -114,6 +113,7 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 		if (this.m_mouseIsOn && !this.m_Pulse) //!this.m_active)
 		{
 			this.activate();
+			this.zoomToCenter();
 		}
 		
 //		if (this.m_Pulse)
@@ -121,6 +121,25 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 //			this.m_Pulse = true;
 //		}
 
+	}
+
+	private void zoomToCenter() 
+	{
+		float newDiameter = this.m_Parent.height * 0.8f;
+		float zoomFactor = newDiameter / this.m_Diameter;
+//		float zoomFactor = 1f;
+		PVector center = PVector.mult(this.m_Origin, zoomFactor * -1);
+//		center.add(this.m_Diameter, this.m_Diameter, 0);
+//		System.out.println("zoom to center");
+//		System.out.println("**** Diameter is " + this.m_Diameter);
+//		System.out.println("**** Actual Origin is " + this.m_Origin);
+//		System.out.println("**** World Origin should be " + center);
+//		System.out.println("**** Diameter should be " + newDiameter);
+//		System.out.println("**** ZoomFactor should be " + zoomFactor);
+		
+		
+		this.m_Parent.centerViewOnTarget(m_Origin, zoomFactor, 3500);
+		
 	}
 
 	/**

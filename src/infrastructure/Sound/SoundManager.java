@@ -28,7 +28,7 @@ public class SoundManager extends SelfRegisteringComponent implements IDeathList
 		super(i_Parent);
 //		this.m_Parent = i_Parent;
 		this.m_Minim = new Minim(i_Parent);
-		this.m_Minim.debugOn();
+		this.m_Minim.debugOff();
 		
 		// disable parent calls to draw() and update()
 		this.setVisible(false);

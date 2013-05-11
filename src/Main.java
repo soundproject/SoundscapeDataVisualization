@@ -26,7 +26,7 @@ public class Main extends ManagedPApplet
 	// -------------- Preferences ---------------------------------------------------------------------------
 	// general graphics options
 	public static final int FRAMERATE = 60;
-	public static final int WIDTH = 1370;
+	public static final int WIDTH = 1400;
 	public static final int HEIGHT = 700;
 	public static final boolean DRAW_STROKES = false;
 
@@ -35,7 +35,7 @@ public class Main extends ManagedPApplet
 	public static final String TITLE_IMAGE = "Images\\title.png";
 
 	// number of sounds
-	public static final int NUMBER_OF_SOUNDS = 150;
+	public static final int NUMBER_OF_SOUNDS = 1;
 
 	// Colors:
 	public static final Color BACKGROUND_COLOR = new Color(69, 70, 75, 200);
@@ -86,7 +86,7 @@ public class Main extends ManagedPApplet
 			// generate new random sound
 			// TODO: calculate sound parameters according to real info
 			m_Sounds [i] = new Sound (new PVector(random(0, WIDTH), random(0, HEIGHT)),  
-					random(10,90), this, i);
+					random(100,400), this, i);
 		}
 
 		// Initialize services
