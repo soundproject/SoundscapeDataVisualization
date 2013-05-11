@@ -35,7 +35,7 @@ public class Main extends ManagedPApplet
 	public static final String TITLE_IMAGE = "Images\\title.png";
 
 	// number of sounds
-	public static final int NUMBER_OF_SOUNDS = 30;
+	public static final int NUMBER_OF_SOUNDS = 150;
 
 	// Colors:
 	public static final Color BACKGROUND_COLOR = new Color(69, 70, 75, 200);
@@ -50,7 +50,7 @@ public class Main extends ManagedPApplet
 	// General Services
 	protected SoundManager m_SoundManager;
 //	protected TextArea m_TextArea;
-	protected PFont m_Font;	
+	protected PFont m_Font;
 	protected Sound m_SelectedSound = null;
 
 	private Sound [] m_Sounds;
