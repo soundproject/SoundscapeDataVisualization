@@ -25,6 +25,9 @@ import processing.event.MouseEvent;
 public class ManagedPApplet extends PApplet implements IDeathListener 
 {
 
+	private static final float MIN_ZOOM = 1f;
+	private static float MAX_ZOOM = 10f;
+
 	private static final boolean DEBUG = true;
 
 	private static int counter = 0;
@@ -42,6 +45,13 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 	private int m_PrevMouseX;
 	private int m_PrevMouseY;
 	private boolean m_ZoomEnabled = true;
+	private Color m_ZoomBarColor = Color.GREEN.darker();
+
+	private int m_ZoomBarHeight = 125;
+
+	private int m_ZoomBarBottom = 150;
+
+	
 	
 	
 	/**
@@ -96,8 +106,6 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 			}
 		}				
 		
-		
-		
 		this.m_PrevUpdateTime = currentTime;	
 	}
 	
@@ -115,13 +123,12 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		
 		// center on zoom target
 		this.translate(this.m_CenterForZoom.x, this.m_CenterForZoom.y);
-//		this.translate(this.width / 2, this.height / 2);
 		
 		// zoom in / out as needed
 		this.scale(this.m_Zoom);
 		
-		this.translate(-this.m_CenterForZoom.x, -this.m_CenterForZoom.y);
-		
+		// move back
+		this.translate(-this.m_CenterForZoom.x, -this.m_CenterForZoom.y);		
 		
 		// translate center (accounting for zoom)
 		this.translate(this.m_CurrentCenter.x / this.m_Zoom, this.m_CurrentCenter.y / this.m_Zoom);
@@ -135,9 +142,47 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 			}
 		}
 		
+		// return to world coordinates
 		this.popMatrix();
 		
+		if (this.m_ZoomEnabled)
+		{
+			drawZoomBar();
+		}
+		
 		this.m_PrevDrawTime = currentTime;	
+	}
+
+
+	private void drawZoomBar() 
+	{
+		// set graphics settings for vertical zoom bar
+		this.noFill();
+		this.stroke(this.m_ZoomBarColor.getRGB());
+		this.strokeWeight(5);
+		
+		// vertical part of zoom bar
+		this.line(this.width - 30, this.m_ZoomBarBottom - this.m_ZoomBarHeight, this.width - 30, this.m_ZoomBarBottom);
+		
+		// TODO: draw scale on it?
+		
+		// draw current zoom "location"
+		this.strokeWeight(3);
+		
+		float zoomPercent = (this.m_Zoom - MIN_ZOOM) / (MAX_ZOOM - MIN_ZOOM);
+		float yLocation = this.m_ZoomBarBottom - (zoomPercent * this.m_ZoomBarHeight);
+		
+		if (DEBUG)
+		{
+			System.out.println("calculated percent is " + zoomPercent);
+			System.out.println("product is " + (zoomPercent * this.m_ZoomBarHeight));
+			System.out.println("y location is " + yLocation);
+		}
+		
+		this.line(this.width - 30 - 10, yLocation, this.width - 30 + 10, yLocation);
+		
+		
+		
 	}
 
 
@@ -234,7 +279,9 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		{
 			zoomStep *= -1;
 		}
+		
 		this.m_Zoom *= (1 + zoomStep);
+		this.m_Zoom = constrain(m_Zoom, MIN_ZOOM, MAX_ZOOM);
 		
 		if (DEBUG)
 		{
