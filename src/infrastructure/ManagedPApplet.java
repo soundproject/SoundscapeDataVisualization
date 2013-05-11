@@ -4,9 +4,12 @@ import infrastructure.interfaces.IDeathListener;
 import infrastructure.interfaces.IDrawable;
 import infrastructure.interfaces.IUpdateable;
 
+import java.awt.Color;
+import java.awt.color.ColorSpace;
 import java.util.ArrayList;
 
 import processing.core.PApplet;
+import processing.event.MouseEvent;
 
 /**
  * Utility class extending PApplet functionality
@@ -24,6 +27,7 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 	private final ArrayList<Component> m_Components = new ArrayList<Component>();
 	protected int m_PrevUpdateTime;
 	protected int m_PrevDrawTime;
+	private Color m_BackgroundColor;
 	
 	/**
 	 * Add a new component to be automatically drawn and updated
@@ -87,6 +91,8 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		int currentTime = millis();
 		int elapsedTime = currentTime - this.m_PrevDrawTime;
 		
+		drawBackground();
+		
 		// draw all components if visible
 		for (Component component : this.m_Components)
 		{
@@ -100,11 +106,25 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 	}
 
 
+	/**
+	 * Draw the background
+	 */
+	protected void drawBackground() 
+	{
+		clear();
+		this.background(this.m_BackgroundColor.getRGB());
+	}
+	
+	public void setBackgroundColor(Color i_Color)
+	{
+		this.m_BackgroundColor = new Color(i_Color.getColorSpace(), i_Color.getRGBColorComponents(null), i_Color.getAlpha() / 255f);
+	}
+
+
 	@Override
 	public void handleDeath(Object object) 
 	{
-		this.removeComponent((Component)object);
-		
+		this.removeComponent((Component)object);	
 	}
 	
 	
@@ -137,8 +157,7 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		}
 
 		// clear componentsToAdd list
-		this.m_ComponentsToAdd.clear();
-		
+		this.m_ComponentsToAdd.clear();		
 	}
 
 
