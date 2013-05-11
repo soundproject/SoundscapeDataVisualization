@@ -128,20 +128,13 @@ public class Main extends ManagedPApplet
 
 
 	public void draw()
-	{
-
-		drawBackground();		
-
+	{		
+		
 		super.draw();
 
 		// draw title images
 		//		image(m_LegendImage, 10,530);
 		image(m_TitleImage,10,20);
-
-		// draw framerate
-		fill(255);
-		textAlign(LEFT, TOP);
-		text(frameRate, 10, 10);
 	}
 
 	@Override

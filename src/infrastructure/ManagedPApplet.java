@@ -150,6 +150,14 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 			drawZoomBar();
 		}
 		
+		if (DEBUG)
+		{
+			// draw framerate
+			fill(255);
+			textAlign(LEFT, TOP);
+			text(frameRate, 10, 10);
+		}
+		
 		this.m_PrevDrawTime = currentTime;	
 	}
 
@@ -179,10 +187,7 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 			System.out.println("y location is " + yLocation);
 		}
 		
-		this.line(this.width - 30 - 10, yLocation, this.width - 30 + 10, yLocation);
-		
-		
-		
+		this.line(this.width - 30 - 10, yLocation, this.width - 30 + 10, yLocation);						
 	}
 
 
