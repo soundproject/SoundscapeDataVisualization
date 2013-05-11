@@ -279,7 +279,7 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	{
 		this.m_Pulse = true;
 		this.m_totalAnimationTime = this.m_Parent.m_SoundManager.loadAndPlaySound(getRandomSound());
-		this.m_Parent.m_TextArea.displayMessage(this.m_Word, new String[] {"Name: " + this.m_SoundFileName}, 3500);
+//		this.m_Parent.m_TextArea.displayMessage(this.m_Word, new String[] {"Name: " + this.m_SoundFileName}, 3500);
 	}
 	
 	/**

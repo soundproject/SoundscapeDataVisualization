@@ -49,7 +49,7 @@ public class Main extends ManagedPApplet
 
 	// General Services
 	protected SoundManager m_SoundManager;
-	protected TextArea m_TextArea;
+//	protected TextArea m_TextArea;
 	protected PFont m_Font;	
 	protected Sound m_SelectedSound = null;
 
@@ -92,7 +92,7 @@ public class Main extends ManagedPApplet
 		// Initialize services
 		this.m_AutoPlayingManager = new AutoPlayingManager(this);
 		this.m_SoundManager = new SoundManager(this);
-		this.m_TextArea = new TextArea(this, 250, 100, new Point(WIDTH - 250, HEIGHT - 100));
+//		this.m_TextArea = new TextArea(this, 250, 100, new Point(WIDTH - 250, HEIGHT - 100));
 	}
 
 	private void loadContent() {
