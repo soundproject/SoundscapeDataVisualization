@@ -25,6 +25,8 @@ import processing.event.MouseEvent;
 public class ManagedPApplet extends PApplet implements IDeathListener 
 {
 
+	private static final boolean DEBUG = true;
+
 	private static int counter = 0;
 	
 	private final ArrayList<Component> m_ComponentsToAdd = new ArrayList<Component>();
@@ -198,12 +200,50 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 	{
 		super.mouseWheelMoved(e);
 		
-		this.m_Zoom *= (1 - e.getWheelRotation() / 10f);
-		System.out.println("new zoom is " + this.m_Zoom);
+		if (this.m_ZoomEnabled)
+		{
+			zoom(e.getWheelRotation() < 0);
+		}
+	}
+	
+	@Override
+	public void mouseClicked(MouseEvent event) 
+	{	
+		super.mouseClicked(event);
+
+		if (mouseButton == RIGHT)
+		{
+			this.toggleZoom();
+		} else if (mouseButton == CENTER)
+		{
+			this.resetView();
+		}
+		
+	}
+
+
+	/**
+	 * Zooms the view in or out according to parameter
+	 * @param i_zoomIn true for zooming in, false for zooming out
+	 */
+	public void zoom(boolean i_zoomIn) 
+	{
+		float zoomStep = 0.1f;
+		
+		if (!i_zoomIn)
+		{
+			zoomStep *= -1;
+		}
+		this.m_Zoom *= (1 + zoomStep);
+		
+		if (DEBUG)
+		{
+			System.out.println("new zoom is " + this.m_Zoom);
+			System.out.println("zoom-in?" + i_zoomIn);
+		}
 		
 		
 		this.m_CenterForZoom = new PVector(mouseX / this.m_Zoom, mouseY / this.m_Zoom);
-		
 	}
 	
 	@Override
@@ -212,20 +252,84 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		// TODO Auto-generated method stub
 		super.mouseDragged(event);
 		
-		System.out.println("MouseX " + mouseX);
-		PVector translation = new PVector(mouseX - this.m_PrevMouseX, mouseY - this.m_PrevMouseY);
-		System.out.println("translation is " + translation);
-		this.m_CurrentCenter.add(translation);
+		if (this.m_ZoomEnabled)
+		{
+			PVector translation = new PVector(mouseX - this.m_PrevMouseX, mouseY - this.m_PrevMouseY);
+			
+			if (DEBUG)
+			{
+				System.out.println("MouseX is " + mouseX);
+				System.out.println("translation is " + translation);
+			}
+			
+			this.m_CurrentCenter.add(translation);
+		}
+		
 		this.m_PrevMouseX = mouseX;
 		this.m_PrevMouseY = mouseY;
 	}
 	
 	@Override
-	public void mouseMoved(MouseEvent event) {
-		// TODO Auto-generated method stub
+	public void mouseMoved(MouseEvent event) 
+	{
 		super.mouseMoved(event);
+		
+		// keep track of mouse location
 		this.m_PrevMouseX = mouseX;
 		this.m_PrevMouseY = mouseY;
+	}
+	
+	/**
+	 * Enables zooming and panning with mouse and mouse wheel
+	 */
+	public void enableZoom()
+	{
+		this.m_ZoomEnabled = true;
+		
+		if (DEBUG)
+		{
+			System.out.println("Zoom enabled");
+		}
+	}
+	
+	/**
+	 * Disables zooming and panning with mouse and mouse wheel
+	 */
+	public void disableZoom()
+	{
+		this.m_ZoomEnabled = false;
+		if (DEBUG)
+		{
+			System.out.println("Zoom disabled");
+		}
+	}
+	
+	/**
+	 * Toggles zooming on or off
+	 */
+	public void toggleZoom()
+	{
+		if (this.m_ZoomEnabled)
+		{
+			this.disableZoom();
+		} else
+		{
+			this.enableZoom();
+		}
+	}
+	
+	/**
+	 * Resets view as if no zoom or pan was done
+	 */
+	public void resetView()
+	{
+		this.m_Zoom = 1.0f;
+		this.m_CurrentCenter = new PVector(0, 0);
+		
+		if (DEBUG)
+		{
+			System.out.println("View reset");
+		}
 	}
 
 
