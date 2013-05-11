@@ -25,7 +25,7 @@ import processing.event.MouseEvent;
 public class ManagedPApplet extends PApplet implements IDeathListener 
 {
 
-	private static final float MIN_ZOOM = 1f;
+	private static final float MIN_ZOOM = 0.1f;
 	private static float MAX_ZOOM = 10f;
 
 	private static final boolean DEBUG = true;
@@ -41,7 +41,7 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 	
 	private float m_Zoom = 1.0f;
 	private PVector m_CenterForZoom = new PVector(0, 0);
-	private PVector m_CurrentCenter = new PVector(0, 0);
+	private PVector m_WorldOrigin = new PVector(0, 0);
 	private int m_PrevMouseX;
 	private int m_PrevMouseY;
 	private boolean m_ZoomEnabled = true;
@@ -122,16 +122,17 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		pushMatrix();
 		
 		// center on zoom target
-		this.translate(this.m_CenterForZoom.x, this.m_CenterForZoom.y);
+		this.translate(0, 0);
+//		this.translate(this.m_CenterForZoom.x, this.m_CenterForZoom.y);
 		
 		// zoom in / out as needed
 		this.scale(this.m_Zoom);
 		
 		// move back
-		this.translate(-this.m_CenterForZoom.x, -this.m_CenterForZoom.y);		
+//		this.translate(-this.m_CenterForZoom.x, -this.m_CenterForZoom.y);		
 		
 		// translate center (accounting for zoom)
-		this.translate(this.m_CurrentCenter.x / this.m_Zoom, this.m_CurrentCenter.y / this.m_Zoom);
+		this.translate(this.m_WorldOrigin.x / this.m_Zoom, this.m_WorldOrigin.y / this.m_Zoom);
 		
 		// draw all components if visible
 		for (Component component : this.m_Components)
@@ -156,6 +157,15 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 			fill(255);
 			textAlign(LEFT, TOP);
 			text(frameRate, 10, 10);
+			
+			// draw world transformation and mouse info
+			textAlign(LEFT, BOTTOM);
+			text("Mouse world coordinates " + getWorldMouse(), 10, this.height - 10);
+			text("Mouse actual coordinates" + new PVector(mouseX, mouseY), 10, this.height - 40);
+			text("World Origin is at " + this.m_WorldOrigin, 10, this.height - 70);
+//			System.out.println("Mouse world coordinates" + result);
+//			System.out.println("Actual mouse is on " + mouseX + " " + mouseY);
+			
 		}
 		
 		this.m_PrevDrawTime = currentTime;	
@@ -179,13 +189,6 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		
 		float zoomPercent = (this.m_Zoom - MIN_ZOOM) / (MAX_ZOOM - MIN_ZOOM);
 		float yLocation = this.m_ZoomBarBottom - (zoomPercent * this.m_ZoomBarHeight);
-		
-		if (DEBUG)
-		{
-			System.out.println("calculated percent is " + zoomPercent);
-			System.out.println("product is " + (zoomPercent * this.m_ZoomBarHeight));
-			System.out.println("y location is " + yLocation);
-		}
 		
 		this.line(this.width - 30 - 10, yLocation, this.width - 30 + 10, yLocation);						
 	}
@@ -267,6 +270,9 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		} else if (mouseButton == CENTER)
 		{
 			this.resetView();
+		} else
+		{
+			this.getWorldMouse();
 		}
 		
 	}
@@ -314,7 +320,7 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 				System.out.println("translation is " + translation);
 			}
 			
-			this.m_CurrentCenter.add(translation);
+			this.m_WorldOrigin.add(translation);
 		}
 		
 		this.m_PrevMouseX = mouseX;
@@ -376,12 +382,25 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 	public void resetView()
 	{
 		this.m_Zoom = 1.0f;
-		this.m_CurrentCenter = new PVector(0, 0);
+		this.m_WorldOrigin = new PVector(0, 0);
 		
 		if (DEBUG)
 		{
 			System.out.println("View reset");
 		}
+	}
+	
+	public PVector getWorldMouse()
+	{
+		PVector result = new PVector((mouseX - this.m_WorldOrigin.x) / this.m_Zoom, (mouseY - this.m_WorldOrigin.y) / this.m_Zoom);
+		
+//		if (DEBUG)
+//		{
+//			System.out.println("Mouse world coordinates" + result);
+//			System.out.println("Actual mouse is on " + mouseX + " " + mouseY);
+//		}
+		
+		return result;
 	}
 
 

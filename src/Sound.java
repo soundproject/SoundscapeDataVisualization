@@ -220,8 +220,8 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	private boolean isMouseOnCircle() 
 	{
 		
-		return Math.abs(this.m_Origin.x - this.m_Parent.mouseX) < this.m_Diameter / 2
-				&& Math.abs(this.m_Origin.y - this.m_Parent.mouseY) < this.m_Diameter / 2;
+		return Math.abs(this.m_Origin.x - this.m_Parent.getWorldMouse().x) < this.m_Diameter / 2
+				&& Math.abs(this.m_Origin.y - this.m_Parent.getWorldMouse().y) < this.m_Diameter / 2;
 	}
 
 	
