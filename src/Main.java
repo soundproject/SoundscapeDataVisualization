@@ -90,9 +90,6 @@ public class Main extends ManagedPApplet
 		this.m_AutoPlayingManager = new AutoPlayingManager(this);
 		this.m_SoundManager = new SoundManager(this);
 		this.m_TextArea = new TextArea(this, 250, 100, new Point(WIDTH - 250, HEIGHT - 100));
-		
-		// register for mouseEvent
-		this.registerMethod("mouseEvent", this);
 	}
 	
 	private void loadContent() {
@@ -113,7 +110,6 @@ public class Main extends ManagedPApplet
 	 */
 	public void mouseEvent(MouseEvent e)
 	{
-//		super.mouseEvent(e);
 
 		// reset idle time if mouse event happened
 		this.m_IdleTime = 0;
@@ -123,15 +119,8 @@ public class Main extends ManagedPApplet
 		{
 			this.m_AutoPlayingManager.Deactivate();
 		}
-				
-		// handle mouse event
-		switch (e.getAction()) {
-			case MouseEvent.CLICK:
-				this.mouseClicked(e);
-				break;
-			default:
-				break;
-		}		
+		
+		super.mouseEvent(e);
 	}
 	
 	@Override
@@ -191,10 +180,11 @@ public class Main extends ManagedPApplet
 	}	
 	
 	@Override
-	public void mouseClicked (MouseEvent e)
+	protected void mouseClickHandler ()
 	{
-		super.mouseClicked();
-		this.m_AutoPlayingManager.setEnabled(!this.m_AutoPlayingManager.Enabled());
+		super.mouseClickHandler();
+//		this.m_AutoPlayingManager.setEnabled(!this.m_AutoPlayingManager.Enabled());
+		this.m_ZoomManager.fillScreenWithShape(new Pulse(new PVector(mouseX, mouseY), 30, Color.green, 3500, this));
 	}
 
 

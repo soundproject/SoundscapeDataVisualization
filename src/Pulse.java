@@ -109,4 +109,11 @@ public class Pulse extends SelfRegisteringComponent {
 		this.m_Diameter += this.m_growthPerSecond * elapsedTime / 1000f;				
 	}
 	
+	@Override
+	public PVector getCenter() 
+	{
+		// TODO Auto-generated method stub
+		return this.m_Origin.get();
+	}
+	
 }

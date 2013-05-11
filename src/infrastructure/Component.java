@@ -2,6 +2,8 @@ package infrastructure;
 
 import java.util.ArrayList;
 
+import processing.core.PVector;
+
 import infrastructure.interfaces.IDeathListener;
 import infrastructure.interfaces.IDrawable;
 import infrastructure.interfaces.IUpdateable;
@@ -89,5 +91,27 @@ public abstract class Component implements IUpdateable, IDrawable
 			listener.handleDeath(this);
 		}
 	}
+	
+	@Override
+	public PVector getCenter() 
+	{
+		// TODO Auto-generated method stub
+		return new PVector(0, 0);
+	}
+	
+	@Override
+	public float getHeight() 
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	@Override
+	public float getWidth() 
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
 
 }

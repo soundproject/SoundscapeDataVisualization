@@ -37,6 +37,8 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 	private PVector m_PreviousMouseLocation;
 	private PVector m_Offset;
 	private Color m_BackgroundColor = Color.black;
+	private PVector m_TranslationVector = new PVector(0, 0);
+	protected ZoomManager m_ZoomManager;
 	
 
 	@Override
@@ -49,13 +51,50 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		this.m_zoomFactor = 1.0f;
 		this.m_PrevOffset = new PVector(0, 0);
 		this.m_Offset = new PVector(0, 0);
-		//		this.m_PreviousMouseLocation = ORIGIN;
+		
+		this.m_ZoomManager = new ZoomManager(this);
+		this.m_ZoomManager.setCurrentCenter(new PVector(0, 0));
+		this.m_ZoomManager.setTargetCenter(new PVector(0, 0));
+		
 
 		this.smooth(8);
 
 		// register for pre event to manage elapsed time and call update()
 		// on all updateables automatically
 		registerMethod("pre", this);
+		registerMethod("mouseEvent", this);
+	}
+	
+	/**
+	 * Handles all mouse events by calling {mouseEvent}Handler() 
+	 * method
+	 * @param e MouseEvent
+	 */
+	public void mouseEvent(MouseEvent e)
+	{
+		// handle mouse event
+		switch (e.getAction()) {
+			case MouseEvent.CLICK:
+				this.mouseClickHandler();
+				break;
+			case MouseEvent.DRAG:
+				this.mouseDragHandler();
+				break;
+			case MouseEvent.PRESS:
+				this.mousePressedHandler();
+				break;
+			case MouseEvent.WHEEL:
+				this.mouseWheelHandler();
+				break;
+			default:
+				break;
+		}		
+	}
+
+	protected void mouseWheelHandler() 
+	{
+		// TODO Auto-generated method stub
+		
 	}
 
 	/**
@@ -92,7 +131,6 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		addNewComponents();
 		removeComponents();
 
-
 		// update all components if they are enabled
 		for (Component component : this.m_Components)
 		{
@@ -105,6 +143,8 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		this.m_ZoomPercent = (this.m_zoomFactor - this.m_MinZoomFactor) / (this.m_MaxZoomFactor - this.m_MinZoomFactor);
 		this.m_ZoomPercent *= (ZOOM_BAR_BOTTOM - ZOOM_BAR_TOP);
 		this.m_ZoomPercent = ZOOM_BAR_BOTTOM - this.m_ZoomPercent;		
+		
+//		this.m_TranslationVector = new PVector(this.m_Offset.x / this.m_zoomFactor, this.m_Offset.y / this.m_zoomFactor);
 
 		this.m_PrevUpdateTime = currentTime;	
 	}
@@ -131,7 +171,7 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 
 		// Center on requested zoom target
 //		this.translate(this.m_Offset.x / this.m_zoomFactor, this.m_Offset.y / this.m_zoomFactor);
-		this.translate(this.m_Offset.x / this.m_zoomFactor, this.m_Offset.y / this.m_zoomFactor);
+		this.translate(this.m_TranslationVector.x, this.m_TranslationVector.y);
 
 		//		translate(offset.x/zoom, offset.y/zoom);
 
@@ -197,10 +237,10 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		this.m_BackgroundColor = i_Color;
 	}
 
-	@Override
-	public void mousePressed() 
+
+	protected void mousePressedHandler() 
 	{
-		super.mousePressed();
+//		super.mousePressed();
 		this.m_PreviousMouseLocation = new PVector(mouseX, mouseY);
 		this.m_PrevOffset.set(this.m_Offset);
 		this.ellipseMode(CENTER);
@@ -209,13 +249,13 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		
 	};
 	
-	@Override
-	public void mouseReleased() {
+
+	protected void mousesReleased() {
 		super.mouseReleased();
 	}
 
-	@Override
-	public void mouseDragged() 
+
+	protected void mouseDragHandler() 
 	{
 //		super.mouseDragged();
 		this.m_Offset.x = this.mouseX + this.m_PreviousMouseLocation.x - this.m_PrevOffset.x;
@@ -223,10 +263,12 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 
 	};
 	
-	@Override
-	public void mouseClicked()
+
+	protected void mouseClickHandler()
 	{
-		super.mouseClicked();		
+		super.mouseClicked();
+//		this.m_ZoomManager.setTargetCenter(new PVector(mouseX, mouseY));
+//		System.out.println("new location should be " + new PVector(mouseX, mouseY));
 	};
 
 	// Zoom in and out when the key is pressed
@@ -297,6 +339,12 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		// clear componentsToAdd list
 		this.m_ComponentsToAdd.clear();
 
+	}
+
+	public void setCenter(PVector i_CurrentCenter) 
+	{
+		this.m_TranslationVector.set(i_CurrentCenter);
+		
 	}
 
 
