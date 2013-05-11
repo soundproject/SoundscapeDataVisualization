@@ -24,7 +24,7 @@ public class Main extends ManagedPApplet
 
 // -------------- Preferences ---------------------------------------------------------------------------
 	// general graphics options
-	public static final int FRAMERATE = 60;
+	public static final int FRAMERATE = 30;
 	public static final int WIDTH = 1370;
 	public static final int HEIGHT = 700;
 
@@ -58,6 +58,7 @@ public class Main extends ManagedPApplet
 	private int m_IdleTime;
 	private int m_MaxIdleTime = 6500;
 	private AutoPlayingManager m_AutoPlayingManager;
+	private boolean m_drawStrokes = false;
 	
 
 	public void setup()
@@ -112,6 +113,7 @@ public class Main extends ManagedPApplet
 	 */
 	public void mouseEvent(MouseEvent e)
 	{
+//		super.mouseEvent(e);
 
 		// reset idle time if mouse event happened
 		this.m_IdleTime = 0;
@@ -154,7 +156,7 @@ public class Main extends ManagedPApplet
 	public void draw()
 	{
 		
-		drawBackground(false);		
+//		drawBackground(false);		
 		
 		super.draw();
 		
@@ -169,16 +171,14 @@ public class Main extends ManagedPApplet
 	}
 	
 	
-	/**
-	 * Draws the grey background
-	 * @param drawStrokes true for drawing diagonal strokes on background
-	 */
-	private void drawBackground(boolean drawStrokes) {
+
+	@Override
+	protected void drawBackground() {
 		
 		background(BACKGROUND_COLOR.getRed(), BACKGROUND_COLOR.getGreen(), 
 				BACKGROUND_COLOR.getBlue(), BACKGROUND_COLOR.getAlpha());
 
-		if (drawStrokes)
+		if (m_drawStrokes)
 		{
 			for (int row=0; row<5000; row=row+20)
 			{
@@ -193,6 +193,7 @@ public class Main extends ManagedPApplet
 	@Override
 	public void mouseClicked (MouseEvent e)
 	{
+		super.mouseClicked();
 		this.m_AutoPlayingManager.setEnabled(!this.m_AutoPlayingManager.Enabled());
 	}
 
