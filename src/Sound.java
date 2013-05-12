@@ -21,13 +21,20 @@ import processing.event.MouseEvent;
 public class Sound extends SelfRegisteringComponent implements IDeathListener
 {
 	
+	private static final int INACTIVE_LINE_WIDTH = 4;
+	private static final int ACTIVE_LINE_WIDTH = 6;
+
 	// TODO: remove these and get them from DB
 	public static final String[] WORDS = {"Truck", "Bird", "Dog", "Cat", "Laughter", "Rain", "Waves"};
+	
+	public static Color[] COLORS = {Main.INACTIVE_COLOR, Main.INACTIVE_COLOR};
+	
 	
 	// need access to Main parent for sounds and other services
 	private Main m_Parent;
 	private PVector m_Origin;
 	private Color m_Color;
+	private Color m_InactiveColor;
 	private String m_Word;
 	private float m_Diameter;
 	private boolean m_mouseIsOn;
@@ -69,9 +76,18 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 		// initialize members
 		this.m_Origin = i_Origin;
 		m_Diameter = i_Diameter;
-		this.m_Color = Main.INACTIVE_COLOR;
-		this.m_pleasantness = i;
+//		this.m_Color = Main.INACTIVE_COLOR;
 		this.m_Parent = i_Parent;
+		try
+		{
+		this.m_InactiveColor = Sound.COLORS[(int)this.m_Parent.random(0, Sound.COLORS.length)];
+		} catch (NullPointerException e)
+		{
+			System.out.println("ouch " + e.getMessage());
+			System.out.println("ouch 1 " + e.getCause());
+		}
+		this.m_Color = new Color(this.m_InactiveColor.getRGB(), false);
+		this.m_pleasantness = i;
 		
 //		this.m_Velocity = PVector.div(i_Velocity, 5f);
 
@@ -85,7 +101,7 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 		this.m_SoundFileName = getRandomSound();
 		System.out.println("Random Sound is " + m_SoundFileName);
 		
-		this.m_NumberOfPeople = (int)this.m_Parent.random(1, 100);
+		this.m_NumberOfPeople = (int)this.m_Parent.random(1, this.m_Diameter / 5);
 	}
 	
 	public void keyEvent(KeyEvent event)
@@ -140,6 +156,7 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 		if (this.m_mouseIsOn && !this.m_Pulse) //!this.m_active)
 		{
 			this.activate();
+			
 		}
 		
 //		if (this.m_Pulse)
@@ -154,7 +171,7 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	 */
 	public void select()
 	{
-		this.m_Parent.strokeWeight(4);
+		this.m_Parent.strokeWeight(ACTIVE_LINE_WIDTH);
 		this.m_Parent.stroke(203,214,208);
 		this.m_Parent.stroke(this.m_Color.getRGB());
 		this.m_Parent.noFill();
@@ -170,7 +187,8 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 		isMouseOn();
 		
 		// update color of circle if mouse is on the circle
-		this.m_Color = this.m_mouseIsOn ? Main.ACTIVE_COLOR.brighter() : Main.INACTIVE_COLOR;
+//		this.m_Color = this.m_mouseIsOn ? Main.ACTIVE_COLOR.brighter() : Main.INACTIVE_COLOR;
+		this.m_Color = this.m_mouseIsOn ? Main.ACTIVE_COLOR.brighter() : this.m_InactiveColor;
 		
 		// Pulse if needed
 		if (this.m_Pulse)
@@ -200,6 +218,7 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 			{
 				this.m_Pulse = false;
 				this.m_currentAnimationTime = 0;
+				this.showInfo();
 			}
 		} 						
 		
@@ -274,7 +293,7 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 		// draw shape
 		this.m_Parent.noFill();
 		this.m_Parent.stroke(this.m_Color.getRGB());
-		this.m_Parent.strokeWeight(2);
+		this.m_Parent.strokeWeight(INACTIVE_LINE_WIDTH);
 		this.m_Parent.ellipse(this.m_Origin.x, this.m_Origin.y, m_Diameter, m_Diameter);
 
 		// mouseover?
@@ -350,7 +369,7 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	private String getRandomWord()
 	{
 		
-		return WORDS[(int)(this.m_Parent.random(0, WORDS.length - 1))];
+		return WORDS[(int)(this.m_Parent.random(0, WORDS.length))];
 	}
 
 	@Override
@@ -366,7 +385,8 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	public void activate()
 	{
 		this.m_Pulse = true;
-		this.m_totalAnimationTime = this.m_Parent.m_SoundManager.loadAndPlaySound(getRandomSound());		
+		this.m_totalAnimationTime = this.m_Parent.m_SoundManager.loadAndPlaySound(getRandomSound());
+		this.showInfo();
 //		this.m_Parent.m_TextArea.displayMessage(this.m_Word, new String[] {"Name: " + this.m_SoundFileName}, 3500);
 	}
 	

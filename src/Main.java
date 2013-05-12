@@ -33,9 +33,10 @@ public class Main extends ManagedPApplet
 	// resource locations (base path is ./data/)
 	public static final String LEGEND_IMAGE = "Images\\COLORS.png";
 	public static final String TITLE_IMAGE = "Images\\title.png";
+	public static final String SEARCH_IMAGE = "Images\\search_small.png";
 
 	// number of sounds
-	public static final int NUMBER_OF_SOUNDS = 150;
+	public static final int NUMBER_OF_SOUNDS = 100;
 
 	// Colors:
 	public static final Color BACKGROUND_COLOR = new Color(69, 70, 75, 200);
@@ -60,6 +61,7 @@ public class Main extends ManagedPApplet
 	private int m_IdleTime;
 	private int m_MaxIdleTime = 6500;
 	private AutoPlayingManager m_AutoPlayingManager;
+	private PImage m_SearchImage;
 
 
 
@@ -100,6 +102,7 @@ public class Main extends ManagedPApplet
 		// load images:
 		m_LegendImage = loadImage (LEGEND_IMAGE);
 		m_TitleImage = loadImage(TITLE_IMAGE);
+		m_SearchImage = loadImage(SEARCH_IMAGE);
 
 		// load font
 		m_Font = createFont("Georgia", 18);
@@ -117,7 +120,7 @@ public class Main extends ManagedPApplet
 			this.m_IdleTime += (millis() - this.m_PrevUpdateTime);
 
 			// Activate demo mode if max idle time reached
-			if (this.m_IdleTime >= this.m_MaxIdleTime)
+			if (this.m_IdleTime >= AutoPlayingManager.IDLE_USER_TIME)
 			{
 				this.m_AutoPlayingManager.Activate();
 			}
@@ -134,7 +137,8 @@ public class Main extends ManagedPApplet
 
 		// draw title images
 		//		image(m_LegendImage, 10,530);
-		image(m_TitleImage,10,20);
+		image(m_TitleImage, 10, 20);
+		image(m_SearchImage, -25, 50);
 	}
 
 	@Override
