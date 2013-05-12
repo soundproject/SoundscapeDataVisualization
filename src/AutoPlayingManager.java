@@ -12,8 +12,9 @@ public class AutoPlayingManager extends SelfRegisteringComponent {
 	// Timing settings for transitions between sounds
 	public static final int MINIMUM_TIME_BETWEEN_ACTIVATIONS = 3000;
 	public static final int MAXIMUM_TIME_BETWEEN_ACTIVATIONS = 4500;
-	public static final int MINIMUM_ACTIVATION_TIME = 15000;
-	public static final int MAXIMUM_ACTIVATION_TIME = 25000;
+	public static final int MINIMUM_ACTIVATION_TIME = 7500;
+	public static final int MAXIMUM_ACTIVATION_TIME = 15000;
+	public static final int IDLE_USER_TIME = 20000;
 	
 	// need direct reference to Main parent to work with Sounds
 	private Main m_MainParent;
