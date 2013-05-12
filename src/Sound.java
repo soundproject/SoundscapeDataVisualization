@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import processing.core.PFont;
 import processing.core.PVector;
+import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 
 /**
@@ -45,9 +46,14 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	
 	// Sound file
 	private String m_SoundFileName = "Sounds\\Pomeranian.mp3";
+
+	private boolean m_ShowInfo;
+	
+	private int m_NumberOfPeople;
 	
 //	private PVector m_Velocity;
 
+	
 
 	/**
 	 * Create a new sound object in the visualization
@@ -72,11 +78,31 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 
 		// register for mouse event
 		this.m_Parent.registerMethod("mouseEvent", this);
+		this.m_Parent.registerMethod("keyEvent", this);
 		
 		// TODO: get these from DB
 		this.m_Word = getRandomWord();
 		this.m_SoundFileName = getRandomSound();
 		System.out.println("Random Sound is " + m_SoundFileName);
+		
+		this.m_NumberOfPeople = (int)this.m_Parent.random(1, 100);
+	}
+	
+	public void keyEvent(KeyEvent event)
+	{
+		if (event.getAction() == KeyEvent.PRESS)
+		{
+			if (this.m_mouseIsOn)
+			{
+				this.showInfo();
+			}
+		}
+	}
+
+	private void showInfo() 
+	{
+		System.out.println("I got the event: ");
+		this.m_ShowInfo = !this.m_ShowInfo;
 		
 	}
 
@@ -256,8 +282,70 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 		{
 			this.select();
 		}
+		
+		if (this.m_ShowInfo)
+		{
+			this.drawInfo();
+		}
+		
 	}
 	
+	private void drawInfo() 
+	{
+		this.m_Parent.fill(Color.white.getRGB());
+		this.m_Parent.noStroke();
+		this.m_Parent.textAlign(this.m_Parent.CENTER, this.m_Parent.BOTTOM);
+		
+		float originalFontSize = this.m_Parent.m_Font.getSize();
+		float newSize = 50;
+		this.m_Parent.textSize(newSize);
+		
+//		System.out.println("Original size is " + originalFontSize);
+//		System.out.println("With is " + this.m_Parent.textWidth(this.m_Word));
+//		System.out.println("Diameter is " + this.m_Diameter);
+		
+		// calculate text size to fit in circle
+		
+		while (this.m_Parent.textWidth(this.m_Word) > this.m_Diameter * 0.6f)
+		{
+			this.m_Parent.textSize(--newSize);
+			
+			// just in case size is very small
+			// TODO: Better handling
+			if (newSize <= 3)
+			{
+				break;
+			}
+		}
+		
+		// Draw label
+		this.m_Parent.text(this.m_Word, this.m_Origin.x, this.m_Origin.y);
+		
+		// Draw more info
+		
+		// calc size again
+		String message = String.format("Recorded %d times by %d people", (int)this.m_Diameter / 5, this.m_NumberOfPeople);
+		while (this.m_Parent.textWidth(message) > this.m_Diameter * 0.9f)
+		{
+			this.m_Parent.textSize(--newSize);
+			
+			// just in case size is very small
+			// TODO: Better handling
+			if (newSize == 1f)
+			{
+				break;
+			}
+		}
+		
+		this.m_Parent.text(message, this.m_Origin.x, this.m_Origin.y + newSize);
+		
+		
+		// restore font size:
+		this.m_Parent.textFont(this.m_Parent.m_Font, originalFontSize);
+		
+//		System.out.println("size reset to " + this.m_Parent.m_Font.getSize());
+	}
+
 	// TODO: REMOVE FOR DB
 	private String getRandomWord()
 	{
@@ -278,7 +366,7 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	public void activate()
 	{
 		this.m_Pulse = true;
-		this.m_totalAnimationTime = this.m_Parent.m_SoundManager.loadAndPlaySound(getRandomSound());
+		this.m_totalAnimationTime = this.m_Parent.m_SoundManager.loadAndPlaySound(getRandomSound());		
 //		this.m_Parent.m_TextArea.displayMessage(this.m_Word, new String[] {"Name: " + this.m_SoundFileName}, 3500);
 	}
 	
