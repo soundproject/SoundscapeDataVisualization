@@ -21,6 +21,7 @@ import processing.event.MouseEvent;
 public class Sound extends SelfRegisteringComponent implements IDeathListener
 {
 
+	private static final float ZOOM_FILL_PERCENT = 0.95f;
 	private static final int INACTIVE_LINE_WIDTH = 2;
 	private static final int ACTIVE_LINE_WIDTH = 3;
 
@@ -28,7 +29,7 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	public static final String[] WORDS = {"Truck", "Bird", "Dog", "Cat", "Laughter", "Rain", "Waves"};
 	private static final int TIME_FOR_ZOOM = 3500;
 
-	public static Color[] COLORS = {Main.INACTIVE_COLOR, Main.INACTIVE_COLOR};
+	public static Color[] COLORS = {Main.INACTIVE_COLOR};
 
 
 	// need access to Main parent for sounds and other services
@@ -58,7 +59,7 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	private boolean m_ShowInfo = false;
 
 	private int m_NumberOfPeople;
-	private int m_TimeBeforeAnimation = 5000;
+	private int m_TimeBeforeAnimation = 0;
 	private boolean m_animating = false;
 
 	//	private PVector m_Velocity;
@@ -75,13 +76,13 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	public Sound(PVector i_Origin, float i_Diameter, Main i_Parent, int i)
 	{
 		super(i_Parent);
-
+		
 		// initialize members
 		this.m_Origin = i_Origin;
 		m_Diameter = i_Diameter;
 		//		this.m_Color = Main.INACTIVE_COLOR;
 		this.m_Parent = i_Parent;
-
+//		System.out.println("New sound at " + this.m_Origin + " radius: " + this.m_Diameter);
 		this.m_InactiveColor = Sound.COLORS[(int)this.m_Parent.random(0, Sound.COLORS.length)];
 
 
@@ -116,7 +117,6 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 
 	private void showInfo() 
 	{
-		System.out.println("I got the event: ");
 		this.m_ShowInfo = !this.m_ShowInfo;
 
 	}
@@ -161,7 +161,7 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 
 	private void setToFillScreen() 
 	{
-		float zoomfactor = (this.m_Parent.height * 0.7f) / this.m_Diameter;
+		float zoomfactor = (this.m_Parent.height * ZOOM_FILL_PERCENT) / this.m_Diameter;
 		this.m_Parent.moveToCenter(this.m_Origin, zoomfactor, TIME_FOR_ZOOM);
 
 	}
@@ -175,7 +175,7 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 		this.m_Parent.stroke(203,214,208);
 		this.m_Parent.stroke(this.m_Color.getRGB());
 		this.m_Parent.noFill();
-		this.m_Parent.ellipse(this.m_Origin.x ,this.m_Origin.y ,m_Diameter,m_Diameter);
+		this.m_Parent.ellipse(this.m_Origin.x ,this.m_Origin.y ,m_Diameter ,m_Diameter);
 
 		// TODO: add glow?				
 	}
@@ -421,5 +421,16 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 	public boolean isPlayingSound() {
 
 		return this.m_currentAnimationTime > 0;
+	}
+	
+	public boolean hasIntersection(PVector i_OtherOrigin, float i_OtherDiameter)
+	{
+		boolean result = false;
+		float distance = PVector.dist(this.m_Origin, i_OtherOrigin);
+		float sumRadii = this.m_Diameter / 2 + i_OtherDiameter / 2;
+//		System.out.println("Distance is: " + distance + " Radii are " + sumRadii );
+		result = (distance < sumRadii);
+		return result;
+		
 	}
 }

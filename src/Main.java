@@ -8,6 +8,8 @@ import java.awt.Point;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 
+import com.sun.image.codec.jpeg.TruncatedFileException;
+
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
@@ -59,7 +61,7 @@ public class Main extends ManagedPApplet
 	private PImage m_TitleImage;
 
 	private int m_IdleTime;
-	private int m_MaxIdleTime = 6500;
+
 	private AutoPlayingManager m_AutoPlayingManager;
 	private PImage m_SearchImage;
 
@@ -82,13 +84,41 @@ public class Main extends ManagedPApplet
 
 		// initialize Sound Elements:
 		m_Sounds = new Sound [NUMBER_OF_SOUNDS];
+//		m_Sounds[0] = new Sound (new PVector(this.random(0, WIDTH),this.random(-HEIGHT * 1, HEIGHT * 2)),  
+//				random(30, 100), this, 0);
+		
 		for (int i = 0; i < this.m_Sounds.length; i++)
 		{
-
+//			System.out.println("New sound");
 			// generate new random sound
 			// TODO: calculate sound parameters according to real info
-			m_Sounds [i] = new Sound (new PVector(random(0, WIDTH), random(0, HEIGHT)),  
-					random(10,90), this, i);
+			PVector origin = new PVector(this.random(0, WIDTH),this.random(0, HEIGHT));
+			float radius = this.random(30,100);
+//			boolean validLocation = true;
+//			int tryNum = 1;
+//			do
+//			{
+//				origin = new PVector(this.random(-WIDTH * 1, WIDTH * 2),this.random(-HEIGHT * 1, HEIGHT * 2));
+//
+//				radius = random(30,100);
+//
+//
+//				for (Sound sound : this.m_Sounds) 
+//				{
+//					if (sound != null)
+//					{
+//						validLocation &= !sound.hasIntersection(origin, radius);
+//						
+//						if (!validLocation)
+//						{
+//							break;
+//						}
+//					}					
+//				}
+//				tryNum++;
+//			} while (!validLocation && tryNum < 100);
+			m_Sounds [i] = new Sound (origin,  
+					radius, this, i);
 		}
 
 		// Initialize services
@@ -145,8 +175,6 @@ public class Main extends ManagedPApplet
 	protected void drawBackground() 
 	{
 		super.drawBackground();
-		//		background(BACKGROUND_COLOR.getRed(), BACKGROUND_COLOR.getGreen(), 
-		//				BACKGROUND_COLOR.getBlue(), BACKGROUND_COLOR.getAlpha());
 
 		if (DRAW_STROKES)
 		{

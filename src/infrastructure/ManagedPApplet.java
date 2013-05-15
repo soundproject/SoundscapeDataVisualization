@@ -119,6 +119,22 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 			this.m_TimeLeftForCameraAnimation -= elapsedTime;
 		}
 		
+		pushMatrix();
+		
+		// center on zoom target
+		this.translate(0, 0);
+//		this.translate(this.width / 2, this.height /2);
+//		this.translate(this.m_CenterForZoom.x, this.m_CenterForZoom.y);
+		
+		// zoom in / out as needed
+		this.scale(this.m_Zoom);
+		
+		// move back
+//		this.translate(-this.m_CenterForZoom.x / this.m_Zoom, -this.m_CenterForZoom.y / this.m_Zoom);		
+		
+		// translate center (accounting for zoom)
+		this.translate(this.m_WorldOrigin.x / this.m_Zoom, this.m_WorldOrigin.y / this.m_Zoom);
+		
 		// update all components if they are enabled
 		for (Component component : this.m_Components)
 		{
@@ -127,6 +143,8 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 				component.update(elapsedTime);
 			}
 		}				
+		
+		popMatrix();
 		
 		this.m_PrevUpdateTime = currentTime;	
 	}
