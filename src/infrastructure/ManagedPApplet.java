@@ -50,6 +50,14 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 	private int m_ZoomBarHeight = 125;
 
 	private int m_ZoomBarBottom = 150;
+	private PVector m_TargetOffset;
+	private float m_TargetZoom;
+	private int m_TimeLeftForCameraAnimation;
+	private float m_ZoomStep;
+	private PVector m_OffsetStep;
+	private PVector m_OriginalOffset;
+	private float m_OriginalZoom;
+	private int m_OriginalAnimationTime;
 
 	
 	
@@ -88,7 +96,7 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 	{	
 		// keep track of time
 		int currentTime = millis();
-		int ellapsedTime = currentTime - this.m_PrevUpdateTime;
+		int elapsedTime = currentTime - this.m_PrevUpdateTime;
 		
 		// add and remove components as needed
 		// separated from addComponent to allow subclasses of Component
@@ -97,12 +105,26 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		addNewComponents();
 		removeComponents();		
 		
+		// update camera settings if needed to animate:
+		
+		if (this.m_TimeLeftForCameraAnimation > 0)
+		{
+//			this.m_Zoom += ((this.m_TargetZoom - this.m_Zoom)  / this.m_TimeLeftForCameraAnimation) * elapsedTime;
+//			PVector step = PVector.sub(this.m_TargetOffset, this.m_WorldOrigin);
+//			step.div(this.m_TimeLeftForCameraAnimation);
+//			step.mult(elapsedTime);
+//			this.setOffset(PVector.add(this.m_WorldOrigin, step));
+			this.m_Zoom += this.m_ZoomStep * elapsedTime;
+			this.m_WorldOrigin.add(PVector.mult(this.m_OffsetStep, elapsedTime));
+			this.m_TimeLeftForCameraAnimation -= elapsedTime;
+		}
+		
 		// update all components if they are enabled
 		for (Component component : this.m_Components)
 		{
 			if (component.Enabled())
 			{
-				component.update(ellapsedTime);
+				component.update(elapsedTime);
 			}
 		}				
 		
@@ -123,13 +145,14 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		
 		// center on zoom target
 		this.translate(0, 0);
+//		this.translate(this.width / 2, this.height /2);
 //		this.translate(this.m_CenterForZoom.x, this.m_CenterForZoom.y);
 		
 		// zoom in / out as needed
 		this.scale(this.m_Zoom);
 		
 		// move back
-//		this.translate(-this.m_CenterForZoom.x, -this.m_CenterForZoom.y);		
+//		this.translate(-this.m_CenterForZoom.x / this.m_Zoom, -this.m_CenterForZoom.y / this.m_Zoom);		
 		
 		// translate center (accounting for zoom)
 		this.translate(this.m_WorldOrigin.x / this.m_Zoom, this.m_WorldOrigin.y / this.m_Zoom);
@@ -163,6 +186,8 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 			text("Mouse world coordinates " + getWorldMouse(), 10, this.height - 10);
 			text("Mouse actual coordinates" + new PVector(mouseX, mouseY), 10, this.height - 40);
 			text("World Origin is at " + this.m_WorldOrigin, 10, this.height - 70);
+			text("Screen center is at " + this.getWorldCenter(), 10, this.height - 100);
+			text("Calculated world origin is at " + this.calcWorldOffset(getWorldCenter(), this.m_Zoom), 10, this.height - 130);
 //			System.out.println("Mouse world coordinates" + result);
 //			System.out.println("Actual mouse is on " + mouseX + " " + mouseY);
 			
@@ -304,6 +329,8 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		this.m_CenterForZoom = new PVector(mouseX / this.m_Zoom, mouseY / this.m_Zoom);
 	}
 	
+	
+	
 	@Override
 	public void mouseDragged(MouseEvent event) 
 	{
@@ -402,6 +429,84 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		
 		return result;
 	}
+	
+	
+	
+	/**
+	 * @return
+	 */
+	public PVector getWorldCenter()
+	{
+		PVector result = new PVector();
+		
+		result.sub(this.m_WorldOrigin);
+		
+		result.add(new PVector((this.width / 2) / this.m_Zoom, (this.height /2)  / this.m_Zoom));
+		return result;
+	}
+	
+	/**
+	 * Calculates the required world offset to place i_Center in 
+	 * center of viewport with i_ZoomFactor zoom
+	 * @param i_Center world coordinates to center viewport on
+	 * @param i_ZoomFactor desired zoom factor
+	 * @return vector to offset camera to center on required coordinates
+	 */
+	public PVector calcWorldOffset(PVector i_Center, float i_ZoomFactor)
+	{
+		PVector result = new PVector();
+		
+		result.sub(PVector.mult(i_Center, i_ZoomFactor));
+		
+		result.add(new PVector((this.width / 2), (this.height / 2)));
+		
+		return result;
+	}
 
+	
+	/**
+	 * @param i_ZoomFactor 
+	 */
+	public void setZoom(float i_ZoomFactor) 
+	{		
+		this.m_Zoom = i_ZoomFactor;		
+	}
+	
+	public void setOffset(PVector offset) 
+	{	
+		this.m_WorldOrigin.set(offset);
+//		System.out.println("World Origin is at " + offset);
+	}
+	
+	/**
+	 * @param i_Center
+	 * @param i_ZoomFactor
+	 * @param i_TimeToAnimate
+	 */
+	public void moveToCenter(PVector i_Center, float i_ZoomFactor, int i_TimeToAnimate)
+	{
+		PVector targetOffset = calcWorldOffset(i_Center, i_ZoomFactor);
+		
+		this.m_TimeLeftForCameraAnimation = i_TimeToAnimate;
+		this.m_OriginalAnimationTime = i_TimeToAnimate;
+		
+		this.m_ZoomStep = ((i_ZoomFactor - this.m_Zoom) / i_TimeToAnimate);
+		this.m_OffsetStep = PVector.sub(targetOffset, this.m_WorldOrigin);
+		this.m_OffsetStep.div(i_TimeToAnimate);
+		
+		this.m_OriginalOffset = new PVector();
+		this.m_OriginalOffset.set(this.m_WorldOrigin);
+		this.m_OriginalZoom = this.m_Zoom;
+		
+	}
+	
+	public void returnViewToPrevious(int i_TimeToAnimate)
+	{
+		this.m_OffsetStep = PVector.sub(this.m_OriginalOffset, this.m_WorldOrigin);
+		this.m_OffsetStep.div(i_TimeToAnimate);
+		this.m_ZoomStep = ((this.m_OriginalZoom - this.m_Zoom) / i_TimeToAnimate);
+		this.m_TimeLeftForCameraAnimation = i_TimeToAnimate; 
+		System.out.println("Original offset " + this.m_OriginalOffset);
+	}
 
 }

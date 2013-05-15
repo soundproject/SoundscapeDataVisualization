@@ -24,10 +24,11 @@ public class Pulse extends SelfRegisteringComponent {
 	private float m_OriginalDiameter;
 	private Color m_Color;
 	private long m_LifeTime;
-	private int m_growthPerSecond = 120;
+	private int m_growthPerSecond = 75;
 	private int m_fadePerSecond = 100;
 	private long m_Alpha = 192;
 	private boolean m_dead = false;
+	private float m_acceleration = -5;
 	
 	/**
 	 * Creates a new animated growing and fading circle
@@ -106,7 +107,8 @@ public class Pulse extends SelfRegisteringComponent {
 	 * @param elapsedTime
 	 */
 	private void grow(float elapsedTime) {
-		this.m_Diameter += this.m_growthPerSecond * elapsedTime / 1000f;				
+		this.m_Diameter += this.m_growthPerSecond * elapsedTime / 1000f;
+		this.m_growthPerSecond += this.m_acceleration * elapsedTime / 1000f;
 	}
 	
 }

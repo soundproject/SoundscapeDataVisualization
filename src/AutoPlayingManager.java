@@ -14,7 +14,7 @@ public class AutoPlayingManager extends SelfRegisteringComponent {
 	public static final int MAXIMUM_TIME_BETWEEN_ACTIVATIONS = 4500;
 	public static final int MINIMUM_ACTIVATION_TIME = 7500;
 	public static final int MAXIMUM_ACTIVATION_TIME = 15000;
-	public static final int IDLE_USER_TIME = 20000;
+	public static final int IDLE_USER_TIME = 100000;
 	
 	// need direct reference to Main parent to work with Sounds
 	private Main m_MainParent;
@@ -72,7 +72,7 @@ public class AutoPlayingManager extends SelfRegisteringComponent {
 				if (this.m_delayTime < 0)
 				{
 					// trigger next sound and reset delayTime
-					this.m_MainParent.getSounds()[this.m_ActiveSoundIndex].activate();
+					this.m_MainParent.getSounds()[this.m_ActiveSoundIndex].activate(false);
 					this.m_delayTime = 2000;
 				}
 			}
@@ -98,7 +98,7 @@ public class AutoPlayingManager extends SelfRegisteringComponent {
 		
 		// activate the sound and generate random playing time within defined values
 		Sound selectedSound = this.m_MainParent.getSounds()[this.m_ActiveSoundIndex];
-		selectedSound.activate();
+		selectedSound.activate(false);
 		generateNewPlayTime();
 		
 		// set playing flag and reset playing time counter

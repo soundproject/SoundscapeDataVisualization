@@ -31,12 +31,12 @@ public class Main extends ManagedPApplet
 	public static final boolean DRAW_STROKES = false;
 
 	// resource locations (base path is ./data/)
-	public static final String LEGEND_IMAGE = "Images\\COLORS.png";
-	public static final String TITLE_IMAGE = "Images\\title.png";
-	public static final String SEARCH_IMAGE = "Images\\search_small.png";
+	public static final String LEGEND_IMAGE = "Images/COLORS.png";
+	public static final String TITLE_IMAGE = "Images/title.png";
+	public static final String SEARCH_IMAGE = "Images/search_small.png";
 
 	// number of sounds
-	public static final int NUMBER_OF_SOUNDS = 100;
+	public static final int NUMBER_OF_SOUNDS = 50;
 
 	// Colors:
 	public static final Color BACKGROUND_COLOR = new Color(69, 70, 75, 200);
@@ -219,4 +219,8 @@ public class Main extends ManagedPApplet
 			PApplet.main(appletArgs);
 		}
 	}
+
+
+
+
 }
