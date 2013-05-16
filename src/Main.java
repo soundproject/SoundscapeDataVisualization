@@ -14,6 +14,7 @@ import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
 import processing.core.PVector;
+import processing.event.KeyEvent;
 import processing.event.MouseEvent;
 
 
@@ -33,12 +34,12 @@ public class Main extends ManagedPApplet
 	public static final boolean DRAW_STROKES = false;
 
 	// resource locations (base path is ./data/)
-	public static final String LEGEND_IMAGE = "Images/COLORS.png";
-	public static final String TITLE_IMAGE = "Images/title.png";
-	public static final String SEARCH_IMAGE = "Images/search_small.png";
+	public static final String LEGEND_IMAGE = "data/Images/COLORS.png";
+	public static final String TITLE_IMAGE = "data/Images/title.png";
+	public static final String SEARCH_IMAGE = "data/Images/search_small.png";
 
 	// number of sounds
-	public static final int NUMBER_OF_SOUNDS = 50;
+	public static final int NUMBER_OF_SOUNDS = 650;
 
 	// Colors:
 	public static final Color BACKGROUND_COLOR = new Color(69, 70, 75, 200);
@@ -52,7 +53,7 @@ public class Main extends ManagedPApplet
 
 	// General Services
 	protected SoundManager m_SoundManager;
-//	protected TextArea m_TextArea;
+	//	protected TextArea m_TextArea;
 	protected PFont m_Font;
 	protected Sound m_SelectedSound = null;
 
@@ -64,6 +65,7 @@ public class Main extends ManagedPApplet
 
 	private AutoPlayingManager m_AutoPlayingManager;
 	private PImage m_SearchImage;
+	private String m_UserInput ="";
 
 
 
@@ -72,7 +74,8 @@ public class Main extends ManagedPApplet
 		super.setup();
 
 		// set size and framerate
-		size (WIDTH, HEIGHT);
+		size (displayWidth, displayHeight);
+//		frame.setResizable(true);
 		frameRate(FRAMERATE);
 
 		// load images, fonts, sounds...
@@ -84,39 +87,39 @@ public class Main extends ManagedPApplet
 
 		// initialize Sound Elements:
 		m_Sounds = new Sound [NUMBER_OF_SOUNDS];
-//		m_Sounds[0] = new Sound (new PVector(this.random(0, WIDTH),this.random(-HEIGHT * 1, HEIGHT * 2)),  
-//				random(30, 100), this, 0);
-		
+		//		m_Sounds[0] = new Sound (new PVector(this.random(0, WIDTH),this.random(-HEIGHT * 1, HEIGHT * 2)),  
+		//				random(30, 100), this, 0);
+
 		for (int i = 0; i < this.m_Sounds.length; i++)
 		{
-//			System.out.println("New sound");
+			//			System.out.println("New sound");
 			// generate new random sound
 			// TODO: calculate sound parameters according to real info
-			PVector origin = new PVector(this.random(0, WIDTH),this.random(0, HEIGHT));
+			PVector origin = new PVector(this.random(-displayWidth, displayWidth * 2),this.random(-displayHeight, displayHeight * 2));
 			float radius = this.random(30,100);
-//			boolean validLocation = true;
-//			int tryNum = 1;
-//			do
-//			{
-//				origin = new PVector(this.random(-WIDTH * 1, WIDTH * 2),this.random(-HEIGHT * 1, HEIGHT * 2));
-//
-//				radius = random(30,100);
-//
-//
-//				for (Sound sound : this.m_Sounds) 
-//				{
-//					if (sound != null)
-//					{
-//						validLocation &= !sound.hasIntersection(origin, radius);
-//						
-//						if (!validLocation)
-//						{
-//							break;
-//						}
-//					}					
-//				}
-//				tryNum++;
-//			} while (!validLocation && tryNum < 100);
+			//			boolean validLocation = true;
+			//			int tryNum = 1;
+			//			do
+			//			{
+			//				origin = new PVector(this.random(-WIDTH * 1, WIDTH * 2),this.random(-HEIGHT * 1, HEIGHT * 2));
+			//
+			//				radius = random(30,100);
+			//
+			//
+			//				for (Sound sound : this.m_Sounds) 
+			//				{
+			//					if (sound != null)
+			//					{
+			//						validLocation &= !sound.hasIntersection(origin, radius);
+			//						
+			//						if (!validLocation)
+			//						{
+			//							break;
+			//						}
+			//					}					
+			//				}
+			//				tryNum++;
+			//			} while (!validLocation && tryNum < 100);
 			m_Sounds [i] = new Sound (origin,  
 					radius, this, i);
 		}
@@ -124,7 +127,7 @@ public class Main extends ManagedPApplet
 		// Initialize services
 		this.m_AutoPlayingManager = new AutoPlayingManager(this);
 		this.m_SoundManager = new SoundManager(this);
-//		this.m_TextArea = new TextArea(this, 250, 100, new Point(WIDTH - 250, HEIGHT - 100));
+		//		this.m_TextArea = new TextArea(this, 250, 100, new Point(WIDTH - 250, HEIGHT - 100));
 	}
 
 	private void loadContent() {
@@ -162,13 +165,16 @@ public class Main extends ManagedPApplet
 
 	public void draw()
 	{		
-		
+
 		super.draw();
 
 		// draw title images
 		//		image(m_LegendImage, 10,530);
 		image(m_TitleImage, 10, 20);
 		image(m_SearchImage, -25, 50);
+		
+		// draw search:
+		text(m_UserInput, 30, 85);
 	}
 
 	@Override
@@ -188,9 +194,9 @@ public class Main extends ManagedPApplet
 		}
 	}	
 
-	
-// ******************* EVENT HANDLERS *************************************************************
-	
+
+	// ******************* EVENT HANDLERS *************************************************************
+
 	//-------------- mouse ------------------------------------------------------------------------
 	@Override
 	public void mouseClicked (MouseEvent e)
@@ -199,15 +205,15 @@ public class Main extends ManagedPApplet
 		this.m_AutoPlayingManager.setEnabled(false);
 	}
 
-	
+
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) 
 	{
 		// TODO Auto-generated method stub
 		super.mouseWheelMoved(e);				
-		
+
 	}
-	
+
 	/**
 	 * MouseEvent handler
 	 * @param e MouseEvent sent by Processing Framework to method
@@ -226,7 +232,7 @@ public class Main extends ManagedPApplet
 	}
 
 
-// ******************* END OF EVENT HANDLERS ******************************************************
+	// ******************* END OF EVENT HANDLERS ******************************************************
 
 	/**
 	 * Returns list of sounds
@@ -237,10 +243,13 @@ public class Main extends ManagedPApplet
 
 		return this.m_Sounds;
 	}
+	
+
 
 	static public void main(String[] passedArgs) 
 	{
-		String[] appletArgs = new String[] { "--full-screen", "--bgcolor=#666666", "--stop-color=#cccccc", "sketch_130421a" };
+		String[] appletArgs = new String[] { "--full-screen", "--bgcolor=#666666", "--stop-color=#cccccc", "Main" };
+//		String[] appletArgs = new String[] { "Main" };
 		if (passedArgs != null) {
 			PApplet.main(concat(appletArgs, passedArgs));
 		} else {

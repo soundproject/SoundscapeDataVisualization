@@ -123,7 +123,8 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 
 	// TODO: REMOVE THIS FOR DB
 	private String getRandomSound() {
-		File baseDirectory = new File("../Data/Sounds");
+		File baseDirectory = new File("Data/Sounds");
+		System.out.println(baseDirectory.getAbsolutePath());
 		File directory = new File(baseDirectory, this.m_Word);
 		File[] files = directory.listFiles();
 
@@ -432,5 +433,15 @@ public class Sound extends SelfRegisteringComponent implements IDeathListener
 		result = (distance < sumRadii);
 		return result;
 		
+	}
+
+	public String getName() {
+		// TODO Auto-generated method stub
+		return this.m_Word;
+	}
+
+	public void setColor(Color i_Color) {
+		System.out.println("Color set to " + i_Color);
+		this.m_InactiveColor = i_Color;
 	}
 }
