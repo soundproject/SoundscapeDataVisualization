@@ -244,7 +244,49 @@ public class Main extends ManagedPApplet
 		return this.m_Sounds;
 	}
 	
+	@Override
+	public void keyPressed(KeyEvent event) 
+	{
+		// TODO Auto-generated method stub
+		super.keyPressed(event);
+		
+		if (event.getAction() == KeyEvent.PRESS)
+		{
+			System.out.println("Key code is " + event.getKeyCode());
+			System.out.println("Key is " + event.getKey());
+			if (event.getKey() == '\n')
+			{
+				search(this.m_UserInput);
+				this.m_UserInput = "";
+				System.out.println("GOT IT");
+			} else if (Character.isAlphabetic(event.getKey()))
+			{
+				this.m_UserInput += key;
+			} else if (event.getKeyCode() == 8)
+			{
+				this.m_UserInput = this.m_UserInput.substring(0, this.m_UserInput.length() - 1);
+			}
+		}
+	}
+	
+	
 
+	private void search(String i_UserInput) 
+	{
+		
+		for (Sound sound : this.m_Sounds)
+		{
+//			System.out.println("Checking " + sound.getName().toLowerCase());
+			if (sound.getName().toLowerCase().equals(i_UserInput.toLowerCase()))
+			{
+				sound.setColor(Color.green);
+			} else
+			{
+				sound.setColor(INACTIVE_COLOR);
+			}
+		}
+		
+	}
 
 	static public void main(String[] passedArgs) 
 	{
