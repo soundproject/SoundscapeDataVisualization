@@ -90,4 +90,9 @@ public abstract class Component implements IUpdateable, IDrawable
 		}
 	}
 
+	public boolean isInView() {		
+		
+		return true;
+	}
+
 }

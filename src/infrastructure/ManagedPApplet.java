@@ -52,7 +52,7 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 	private int m_ZoomBarBottom = 150;
 	private PVector m_TargetOffset;
 	private float m_TargetZoom;
-	private int m_TimeLeftForCameraAnimation;
+	protected int m_TimeLeftForCameraAnimation;
 	private float m_ZoomStep;
 	private PVector m_OffsetStep;
 	private PVector m_OriginalOffset;
@@ -178,7 +178,7 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		// draw all components if visible
 		for (Component component : this.m_Components)
 		{
-			if (component.Visible())
+			if (component.Visible() && component.isInView())
 			{
 				component.draw(elapsedTime);
 			}
@@ -527,4 +527,8 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		System.out.println("Original offset " + this.m_OriginalOffset);
 	}
 
+	public float getZoom() {
+		// TODO Auto-generated method stub
+		return this.m_Zoom;
+	}
 }

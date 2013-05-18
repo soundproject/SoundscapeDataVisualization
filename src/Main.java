@@ -66,6 +66,7 @@ public class Main extends ManagedPApplet
 	private AutoPlayingManager m_AutoPlayingManager;
 	private PImage m_SearchImage;
 	private String m_UserInput ="";
+	private boolean m_isZoomingOut;
 
 
 
@@ -165,15 +166,25 @@ public class Main extends ManagedPApplet
 
 	public void draw()
 	{		
-
+		
 		super.draw();
-
+		
+		if (this.m_TimeLeftForCameraAnimation < 0 && this.m_isZoomingOut)
+		{
+			this.m_isZoomingOut = false;
+			for (Sound sound : this.m_Sounds) {
+				sound.showInfo();
+			}
+		}
+		
 		// draw title images
 		//		image(m_LegendImage, 10,530);
 		image(m_TitleImage, 10, 20);
 		image(m_SearchImage, -25, 50);
 		
 		// draw search:
+		fill(0);
+		textAlign(LEFT);
 		text(m_UserInput, 30, 85);
 	}
 
@@ -268,7 +279,7 @@ public class Main extends ManagedPApplet
 			}
 		}
 	}
-	
+	 
 	
 
 	private void search(String i_UserInput) 
@@ -297,6 +308,25 @@ public class Main extends ManagedPApplet
 		} else {
 			PApplet.main(appletArgs);
 		}
+	}
+
+	@Override
+	public void moveToCenter(PVector i_Center, float i_ZoomFactor,
+			int i_TimeToAnimate) {
+		// TODO Auto-generated method stub
+		super.moveToCenter(i_Center, i_ZoomFactor, i_TimeToAnimate);
+		
+		for (Sound sound : this.m_Sounds) {
+			sound.hideInfo();
+		}
+	}
+	
+	@Override
+	public void returnViewToPrevious(int i_TimeToAnimate) {
+		// TODO Auto-generated method stub
+		super.returnViewToPrevious(i_TimeToAnimate);
+		
+		this.m_isZoomingOut = true;
 	}
 
 
