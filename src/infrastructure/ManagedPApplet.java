@@ -28,7 +28,7 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 	private static final float MIN_ZOOM = 0.1f;
 	private static float MAX_ZOOM = 10f;
 
-	private static final boolean DEBUG = false;
+	public static final boolean DEBUG = true;
 
 	private static int counter = 0;
 	
@@ -206,8 +206,6 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 			text("World Origin is at " + this.m_WorldOrigin, 10, this.height - 70);
 			text("Screen center is at " + this.getWorldCenter(), 10, this.height - 100);
 			text("Calculated world origin is at " + this.calcWorldOffset(getWorldCenter(), this.m_Zoom), 10, this.height - 130);
-//			System.out.println("Mouse world coordinates" + result);
-//			System.out.println("Actual mouse is on " + mouseX + " " + mouseY);
 			
 		}
 		
@@ -435,6 +433,10 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 		}
 	}
 	
+	/**
+	 * Returns world coordinates of the mouse
+	 * @return world coordinates of the mouse
+	 */
 	public PVector getWorldMouse()
 	{
 		PVector result = new PVector((mouseX - this.m_WorldOrigin.x) / this.m_Zoom, (mouseY - this.m_WorldOrigin.y) / this.m_Zoom);

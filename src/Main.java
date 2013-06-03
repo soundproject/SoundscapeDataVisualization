@@ -39,7 +39,7 @@ public class Main extends ManagedPApplet
 	public static final String SEARCH_IMAGE = "data/Images/search_small.png";
 
 	// number of sounds
-	public static final int NUMBER_OF_SOUNDS = 650;
+	public static final int NUMBER_OF_SOUNDS = 0;
 
 	// Colors:
 	public static final Color BACKGROUND_COLOR = new Color(69, 70, 75, 200);
@@ -57,7 +57,8 @@ public class Main extends ManagedPApplet
 	protected PFont m_Font;
 	protected Sound m_SelectedSound = null;
 
-	private Sound [] m_Sounds;
+	private Sound[] m_Sounds;
+	private SoundCategory m_SoundCategory;
 	private PImage m_LegendImage;
 	private PImage m_TitleImage;
 
@@ -125,6 +126,7 @@ public class Main extends ManagedPApplet
 					radius, this, i);
 		}
 
+		m_SoundCategory = new SoundCategory(this, "Dog", new Point(200, 500));
 		// Initialize services
 		this.m_AutoPlayingManager = new AutoPlayingManager(this);
 		this.m_SoundManager = new SoundManager(this);
