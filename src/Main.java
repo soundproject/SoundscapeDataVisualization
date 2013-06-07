@@ -1,14 +1,10 @@
 import infrastructure.ManagedPApplet;
 import infrastructure.Sound.SoundManager;
-import infrastructure.interfaces.IDrawable;
-import infrastructure.interfaces.IUpdateable;
 
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseWheelEvent;
-import java.util.ArrayList;
-
-import com.sun.image.codec.jpeg.TruncatedFileException;
+import java.io.File;
 
 import processing.core.PApplet;
 import processing.core.PFont;
@@ -64,7 +60,7 @@ public class Main extends ManagedPApplet
 
 	private int m_IdleTime;
 
-	private AutoPlayingManager m_AutoPlayingManager;
+//	private AutoPlayingManager m_AutoPlayingManager;
 	private PImage m_SearchImage;
 	private String m_UserInput ="";
 	private boolean m_isZoomingOut;
@@ -86,51 +82,68 @@ public class Main extends ManagedPApplet
 		// set graphics options
 		ellipseMode(CENTER);	
 		this.setBackgroundColor(BACKGROUND_COLOR);
+		
+		this.createSoundClouds();
 
-		// initialize Sound Elements:
-		m_Sounds = new Sound [NUMBER_OF_SOUNDS];
-		//		m_Sounds[0] = new Sound (new PVector(this.random(0, WIDTH),this.random(-HEIGHT * 1, HEIGHT * 2)),  
-		//				random(30, 100), this, 0);
-
-		for (int i = 0; i < this.m_Sounds.length; i++)
-		{
-			//			System.out.println("New sound");
-			// generate new random sound
-			// TODO: calculate sound parameters according to real info
-			PVector origin = new PVector(this.random(-displayWidth, displayWidth * 2),this.random(-displayHeight, displayHeight * 2));
-			float radius = this.random(30,100);
-			//			boolean validLocation = true;
-			//			int tryNum = 1;
-			//			do
-			//			{
-			//				origin = new PVector(this.random(-WIDTH * 1, WIDTH * 2),this.random(-HEIGHT * 1, HEIGHT * 2));
-			//
-			//				radius = random(30,100);
-			//
-			//
-			//				for (Sound sound : this.m_Sounds) 
-			//				{
-			//					if (sound != null)
-			//					{
-			//						validLocation &= !sound.hasIntersection(origin, radius);
-			//						
-			//						if (!validLocation)
-			//						{
-			//							break;
-			//						}
-			//					}					
-			//				}
-			//				tryNum++;
-			//			} while (!validLocation && tryNum < 100);
-			m_Sounds [i] = new Sound (origin,  
-					radius, this, i);
-		}
-
-		m_SoundCategory = new SoundCategory(this, "Dog", new Point(200, 500));
+		
 		// Initialize services
-		this.m_AutoPlayingManager = new AutoPlayingManager(this);
 		this.m_SoundManager = new SoundManager(this);
 		//		this.m_TextArea = new TextArea(this, 250, 100, new Point(WIDTH - 250, HEIGHT - 100));
+	}
+
+	private void createSoundClouds() 
+	{
+		File[] soundCategoryList = (new File("Data/Sounds")).listFiles();
+		int cellWidth = this.width / (soundCategoryList.length);
+		int cellHeight = this.height / (soundCategoryList.length);
+		int cellSize = 250;
+		boolean[][] soundCategories = new boolean[soundCategoryList.length / 2][soundCategoryList.length / 2];
+		
+		for (int i = 0; i < soundCategories.length; i++)
+		{
+			for (int j = 0; j < soundCategories[i].length; j++)
+			{
+				soundCategories[i][j] = false;
+			}
+		}
+		
+		for (File soundCategory : soundCategoryList)
+		{
+			int xCell;
+			int yCell;
+			int i = 0;
+			do
+			{
+				xCell  = (int) this.random(soundCategories.length);
+				yCell  = (int) this.random(soundCategories.length);
+			} while (soundCategories[xCell][yCell]);
+			
+			soundCategories[xCell][yCell] = true;
+			int dx = 0;
+			int dy = 0;
+//			if ((xCell > 0 && soundCategories[xCell - 1][yCell]) || 
+//					(xCell < soundCategories.length - 1 && soundCategories[xCell + 1][yCell]))
+//			{
+				dy = (int)this.random(-cellSize / 4, cellSize / 4);				
+//			}
+			
+//			if ((yCell > 0 && soundCategories[xCell][yCell - 1]) || 
+//					(yCell < soundCategories.length - 1 && soundCategories[xCell][yCell + 1]))
+//			{
+				dx = (int)this.random(-cellSize / 4, cellSize / 4);				
+//			}
+
+			
+			Point topLeft = new Point(xCell * cellSize, yCell * cellSize);
+			System.out.println("TopLeft is " + topLeft.x + " " + topLeft.y);
+
+			topLeft.translate(dx, dy);
+			System.out.println("Translation is: " + dx + " " + dy + " for sound " + soundCategory.getName());
+			System.out.println("New topleft is " + topLeft.x + " " + topLeft.y);
+			
+			new SoundCategory(this, soundCategory.getName(), topLeft, cellSize);
+		}
+		
 	}
 
 	private void loadContent() {
@@ -150,17 +163,17 @@ public class Main extends ManagedPApplet
 	@Override
 	public void pre() {
 
-		// if demo mode is not enabled, aggregate idleTime
-		if (!this.m_AutoPlayingManager.Enabled())
-		{
-			this.m_IdleTime += (millis() - this.m_PrevUpdateTime);
-
-			// Activate demo mode if max idle time reached
-			if (this.m_IdleTime >= AutoPlayingManager.IDLE_USER_TIME)
-			{
-				this.m_AutoPlayingManager.Activate();
-			}
-		}
+//		// if demo mode is not enabled, aggregate idleTime
+//		if (!this.m_AutoPlayingManager.Enabled())
+//		{
+//			this.m_IdleTime += (millis() - this.m_PrevUpdateTime);
+//
+//			// Activate demo mode if max idle time reached
+//			if (this.m_IdleTime >= AutoPlayingManager.IDLE_USER_TIME)
+//			{
+//				this.m_AutoPlayingManager.Activate();
+//			}
+//		}
 
 		super.pre();		
 	}
@@ -215,7 +228,7 @@ public class Main extends ManagedPApplet
 	public void mouseClicked (MouseEvent e)
 	{
 		super.mouseClicked(e);
-		this.m_AutoPlayingManager.setEnabled(false);
+//		this.m_AutoPlayingManager.setEnabled(false);
 	}
 
 
@@ -238,10 +251,10 @@ public class Main extends ManagedPApplet
 		this.m_IdleTime = 0;
 
 		// disable demo mode if needed
-		if (this.m_AutoPlayingManager.Enabled())
-		{
-			this.m_AutoPlayingManager.Deactivate();
-		}		
+//		if (this.m_AutoPlayingManager.Enabled())
+//		{
+//			this.m_AutoPlayingManager.Deactivate();
+//		}		
 	}
 
 
