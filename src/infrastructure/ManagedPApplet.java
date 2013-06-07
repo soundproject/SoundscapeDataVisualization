@@ -28,7 +28,7 @@ public class ManagedPApplet extends PApplet implements IDeathListener
 	private static final float MIN_ZOOM = 0.1f;
 	private static float MAX_ZOOM = 10f;
 
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 
 	private static int counter = 0;
 	

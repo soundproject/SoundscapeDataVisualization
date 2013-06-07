@@ -96,7 +96,7 @@ public class Main extends ManagedPApplet
 		File[] soundCategoryList = (new File("Data/Sounds")).listFiles();
 		int cellWidth = this.width / (soundCategoryList.length);
 		int cellHeight = this.height / (soundCategoryList.length);
-		int cellSize = 250;
+		int cellSize = 350;
 		boolean[][] soundCategories = new boolean[soundCategoryList.length / 2][soundCategoryList.length / 2];
 		
 		for (int i = 0; i < soundCategories.length; i++)
@@ -143,6 +143,8 @@ public class Main extends ManagedPApplet
 			
 			new SoundCategory(this, soundCategory.getName(), topLeft, cellSize);
 		}
+		
+//		new SoundCategory(this, "Bird", new Point(200, 500), 300);
 		
 	}
 
