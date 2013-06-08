@@ -1,6 +1,7 @@
 import infrastructure.ManagedPApplet;
 import infrastructure.SelfRegisteringComponent;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.BufferedReader;
@@ -14,15 +15,19 @@ public class SoundCategory extends SelfRegisteringComponent
 {
 	
 	private String m_Name;
-	private final ArrayList<SoundBubble> m_Sounds = new ArrayList<SoundBubble>();
 	private Rectangle m_BoundingRectangle;
 	private boolean m_MouseOver;
-	private float m_MaxAlpha = 70f;
-	private float m_MinAlpha = 0f;
 	private final ArrayList<SoundBubble> m_SoundBubbles = new ArrayList<SoundBubble>();
 	private Main m_Parent;
 	
 	
+	/**
+	 * Create a new soundcategory for the given name in the location provided
+	 * @param i_Parent parent app
+	 * @param i_Name sound category name
+	 * @param i_TopLeft coordinate for top left corner of bounding box
+	 * @param i_Size width and height for bounding box
+	 */
 	public SoundCategory(Main i_Parent, String i_Name, Point i_TopLeft, int i_Size) 
 	{
 		super(i_Parent);
@@ -40,12 +45,11 @@ public class SoundCategory extends SelfRegisteringComponent
 		File baseDirectory = new File("Data/Sounds");
 		System.out.println(baseDirectory.getAbsolutePath());
 		File directory = new File(baseDirectory, this.m_Name);
-		
-		
+
+		HashMap<String, SoundInfo> soundInfoDictInfoDict = readSoundInfoFromDirectory(directory);
 		
 		// Get recognized sounds:
 		File[] recognizedSounds = new File(directory, "Recognized").listFiles();
-		HashMap<String, SoundInfo> soundInfoDictInfoDict = readSoundInfoFromDirectory(directory);
 		
 		for (File file : recognizedSounds)
 		{
@@ -53,7 +57,7 @@ public class SoundCategory extends SelfRegisteringComponent
 			SoundBubble bubble = new SoundBubble(this.m_Parent, 25f, this.nextSoundLocation(), this.m_Name);
 			bubble.setSoundInfo(soundInfo);
 			this.m_SoundBubbles.add(bubble);
-//			System.out.println("Sound file is: " + file.getAbsolutePath());
+			this.m_Parent.registerSoundBubble(bubble);
 		}			
 		
 		// Get unrecognized sounds
@@ -61,15 +65,21 @@ public class SoundCategory extends SelfRegisteringComponent
 		
 		for (File file : unrecognizedSounds)
 		{
-//			SoundInfo soundInfo = new SoundInfo(file, false);
 			SoundInfo soundInfo = soundInfoDictInfoDict.get(file.getName());
 			SoundBubble bubble = new SoundBubble(this.m_Parent, 25f, this.nextSoundLocation(),  this.m_Name);
 			bubble.setSoundInfo(soundInfo);
 			this.m_SoundBubbles.add(bubble);
-//			System.out.println("Sound file is: " + file.getAbsolutePath());
-		}		
+			this.m_Parent.registerSoundBubble(bubble);
+		}
 	}
 
+	/**
+	 * Reads csv file containing sound recording metadata
+	 * and loads them into a dict. Format is:
+	 * FileName, recognized/unrecognized, username, date (dd/mm/yy HH:MM 24 hour format)
+	 * @param directory to load info from
+	 * @return dictionary mapping filename to its soundInfo object
+	 */
 	private HashMap<String, SoundInfo> readSoundInfoFromDirectory(File directory) 
 	{
 		String infoFile = "Sounds/" + directory.getName() + "/sound.info";
@@ -91,53 +101,64 @@ public class SoundCategory extends SelfRegisteringComponent
 		return result;
 	}
 
+	/**
+	 * Set the center of this category to (x, y)
+	 * @param x coordinate to center on
+	 * @param y coordinate to center on
+	 */
 	public void setCenter(int x, int y)
 	{
 		this.m_BoundingRectangle.setLocation(x, y);
 	}
 	
-//	public void addSound(SoundBubble i_Sound)
-//	{
-//		if (!this.m_Sounds.contains(i_Sound))
-//		{
-//			this.m_Sounds.add(i_Sound);
-//			i_Sound.setVisible(true);
-//		}
-//	}
 
+	/**
+	 * returns a valid location for new sound bubble
+	 * @return valid location for new sound bubble
+	 */
 	private Point nextSoundLocation() 
 	{
 		
 		Point result = null;
 		
-		// Generate random angle
-		float angle = this.m_Parent.random(0, this.m_Parent.TWO_PI);
-		
-		// Generate random distance within the bounding rectangle
-		float distance = this.m_Parent.random(20, this.m_BoundingRectangle.width / 2 - 20);
-		
-		// Calculate result location based on a circle centered on the center of the 
 		// bounding rectangle with the calculated angle and distance
-		do{
+		do
+		{
+			// Generate random angle
+			float angle = this.m_Parent.random(0, this.m_Parent.TWO_PI);
+			
+			// Generate random distance within the bounding rectangle
+			float distance = this.m_Parent.random(20, this.m_BoundingRectangle.width / 2 - 20);
+			
+			// Calculate result location based on a circle centered on the center of the 
 			result = new Point((int)this.m_BoundingRectangle.getCenterX() + (int)(this.m_Parent.cos(angle) * distance), 
 						   		(int)this.m_BoundingRectangle.getCenterY() + (int)(this.m_Parent.sin(angle) * distance));
 		}
-		while(!this.isBubbleLocationLegal());
-		
-		
+		while(!this.isBubbleLocationLegal(result));
 		
 		return result;
 	}
 
-	private boolean isBubbleLocationLegal() 
+	/**
+	 * returns true iff location is valid for new sound bubble
+	 * @return true iff location is valid for new sound bubble
+	 */
+	private boolean isBubbleLocationLegal(Point i_Location) 
 	{
-		// TODO Auto-generated method stub
-		return true;
+
+		this.m_Parent.textSize(35);
+		int width = (int)this.m_Parent.textWidth(this.m_Name) + 25;
+		int height = 60;
+		Rectangle textBounds = new Rectangle((int)(this.m_BoundingRectangle.getCenterX() - width / 2), 
+											 (int)(this.m_BoundingRectangle.getCenterY() - height / 2), 
+											 width, height);
+		return !textBounds.contains(i_Location);
 	}
 
 	@Override
 	public void update(long ellapsedTime) 
 	{
+		// check if mouse is inside the bounding rectangle of the cloud
 		if (this.m_BoundingRectangle.contains(new Point((int)this.m_Parent.getWorldMouse().x, (int)this.m_Parent.getWorldMouse().y)))
 		{
 			this.m_MouseOver = true;
@@ -155,14 +176,17 @@ public class SoundCategory extends SelfRegisteringComponent
 	@Override
 	public void draw(long ellapsedTime) 
 	{
+		
+		// draw outline of circle in debug mode
 		if (ManagedPApplet.DEBUG)
 		{
 			this.m_Parent.ellipseMode(this.m_Parent.CENTER);
 			this.m_Parent.noFill();
 			this.m_Parent.strokeWeight(1.1f);
-			java.awt.Color fillColor = java.awt.Color.yellow.darker();
+			Color fillColor = Color.yellow.darker();
 			this.m_Parent.stroke(fillColor.getRGB());
-			this.m_Parent.ellipse((float)this.m_BoundingRectangle.getCenterX(), (float)this.m_BoundingRectangle.getCenterY(), this.m_BoundingRectangle.width, this.m_BoundingRectangle.height);
+			this.m_Parent.ellipse((float)this.m_BoundingRectangle.getCenterX(), (float)this.m_BoundingRectangle.getCenterY(),
+								  this.m_BoundingRectangle.width, this.m_BoundingRectangle.height);
 		}
 		
 		if (this.m_MouseOver)
@@ -175,45 +199,22 @@ public class SoundCategory extends SelfRegisteringComponent
 			bubble.draw(ellapsedTime);
 		}
 		
+
 		this.m_Parent.fill(255);
 		this.m_Parent.textAlign(this.m_Parent.CENTER, this.m_Parent.CENTER);
 		this.m_Parent.textSize(35);
 		this.m_Parent.text(this.m_Name, (float)this.m_BoundingRectangle.getCenterX(), (float)this.m_BoundingRectangle.getCenterY());
-		
-		
 
-	}
-
-	private void drawCircle() 
-	{
-		Point result = nextSoundLocation();
-		this.m_Parent.fill(java.awt.Color.green.getRGB());
-		this.m_Parent.noStroke();
-		this.m_Parent.ellipse(result.x, result.y, 20, 20);		
 	}
 
 	private void drawGlow() 
 	{
 		this.m_Parent.ellipseMode(this.m_Parent.CENTER);
 		this.m_Parent.strokeWeight(1.1f);
-		java.awt.Color fillColor = java.awt.Color.white.darker();
+		Color fillColor = Color.white.darker();
 		this.m_Parent.fill(fillColor.getRed(), fillColor.getGreen(), fillColor.getBlue(), 50);
 		this.m_Parent.noStroke();
-//		this.m_Parent.stroke(fillColor.getRGB());
-		this.m_Parent.ellipse((float)this.m_BoundingRectangle.getCenterX(), (float)this.m_BoundingRectangle.getCenterY(), this.m_BoundingRectangle.width, this.m_BoundingRectangle.height);
-		
-//		for (int i = 0; i < this.m_BoundingRectangle.width; i++)
-//		{
-//			java.awt.Color fillColor = java.awt.Color.white.darker();
-//			this.m_Parent.noFill();
-//			float alpha = this.m_MaxAlpha - this.m_MinAlpha;
-//			alpha /= this.m_BoundingRectangle.width;
-//			alpha *= i;
-//			alpha = this.m_MaxAlpha - alpha;
-//			this.m_Parent.stroke(fillColor.getRed(), fillColor.getGreen(), fillColor.getBlue(), alpha);
-//			this.m_Parent.ellipse((float)this.m_BoundingRectangle.getCenterX(), (float)this.m_BoundingRectangle.getCenterY(), i, i);
-//		}
-		
+		this.m_Parent.ellipse((float)this.m_BoundingRectangle.getCenterX(), (float)this.m_BoundingRectangle.getCenterY(), 
+							  this.m_BoundingRectangle.width, this.m_BoundingRectangle.height);
 	}
-
 }

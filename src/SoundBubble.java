@@ -28,6 +28,8 @@ public class SoundBubble extends Component implements IDeathListener
 	private long m_totalAnimationTime;
 	private boolean m_animating;
 	private TextArea m_Popup;
+	private boolean m_Outline;
+	private Color m_OutlineColor;
 	
 	public SoundBubble(Main i_Parent, float i_Radius, Point i_Origin, String i_Category) 
 	{
@@ -146,26 +148,48 @@ public class SoundBubble extends Component implements IDeathListener
 	@Override
 	public void draw(long ellapsedTime) 
 	{
+		if (this.m_Outline)
+		{
+			this.m_Parent.stroke(this.m_OutlineColor.getRGB());
+			this.m_Parent.strokeWeight(4);
+		} else
+		{
+			this.m_Parent.noStroke();			
+		}
 		
-		this.m_Parent.noStroke();
 		this.m_Parent.fill(this.m_Color.getRGB());
-		
 		this.m_Parent.ellipse(this.m_Origin.x, this.m_Origin.y, this.m_Radius, this.m_Radius);
-		
+				
 		if (this.m_MouseOver)
 		{
 			this.m_Popup.setVisible(true);
 		} else
 		{
 			this.m_Popup.setVisible(false);
-		}
-
+		}		
 	}
 
 	@Override
 	public void handleDeath(Object object) 
 	{
 		this.m_Pulses--;		
+	}
+
+	public void removeOutline() 
+	{
+		this.m_Outline = false;		
+	}
+
+	public void setOutline(Color i_OutlineColor) 
+	{
+		this.m_Outline = true;
+		this.m_OutlineColor = i_OutlineColor;
+		
+	}
+
+	public String getUser() {
+		
+		return this.m_SoundInfo.getUser();
 	}
 
 }

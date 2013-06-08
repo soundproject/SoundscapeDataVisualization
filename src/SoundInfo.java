@@ -44,8 +44,8 @@ public class SoundInfo
 	}
 	
 	@Override
-	public String toString() {
-		
+	public String toString() 
+	{	
 		if (this.m_ToString == null)
 		{
 			this.m_ToString = "Recorded by: " + this.m_User + "\n";
@@ -53,6 +53,16 @@ public class SoundInfo
 		}
 		
 		return this.m_ToString;
+	}
+
+	public String getUser() 
+	{
+		return this.m_User;
+	}
+	
+	public String getDate()
+	{
+		return this.m_Date;
 	}
 
 }

@@ -38,22 +38,6 @@ public class TextArea extends SelfRegisteringComponent {
 	{
 
 		this.m_DisplayTimeLeft -= ellapsedTime;
-		//		System.out.println("Display time left " + this.m_DisplayTimeLeft);
-		//		System.out.println("fade in time? " + (this.m_DisplayTimeLeft > this.m_TotalDisplayTime - this.m_introTime) );
-
-//		// fade out
-//		if (this.m_DisplayTimeLeft < this.m_introTime)
-//		{
-//			float t = (float) ellapsedTime;
-//			this.m_Alpha -= (t / this.m_introTime) * 255;
-//		}
-//
-//		// fade in
-//		if (this.m_DisplayTimeLeft >= this.m_TotalDisplayTime - this.m_introTime)
-//		{
-//			float t = (float)ellapsedTime;
-//			this.m_Alpha += (t / this.m_introTime) * 255;
-//		}
 
 		if (this.m_DisplayTimeLeft < 0)
 		{
