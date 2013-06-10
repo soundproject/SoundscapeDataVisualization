@@ -48,7 +48,6 @@ public class Pulse extends SelfRegisteringComponent {
 		this.m_Color = i_Color;
 		this.m_ParentApp = i_Parent;
 		
-		// TODO: support lifetime in calculations of growthRate and fadePerSecond
 		this.m_LifeTime = i_LifeTime;
 	}
 	
@@ -109,6 +108,11 @@ public class Pulse extends SelfRegisteringComponent {
 	private void grow(float elapsedTime) {
 		this.m_Diameter += this.m_growthPerSecond * elapsedTime / 1000f;
 		this.m_growthPerSecond += this.m_acceleration * elapsedTime / 1000f;
+	}
+
+	public void setColor(Color color) 
+	{
+		this.m_Color = color;		
 	}
 	
 }

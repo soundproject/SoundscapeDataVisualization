@@ -3,6 +3,7 @@ import infrastructure.interfaces.IDeathListener;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.util.ArrayList;
 
 import processing.core.PVector;
 import processing.event.MouseEvent;
@@ -11,6 +12,7 @@ import processing.event.MouseEvent;
 public class SoundBubble extends Component implements IDeathListener 
 {
 
+	private static final Color INACTIVE_COLOR = Color.gray;
 	private float m_Radius;
 	private Point m_Origin;
 	private SoundInfo m_SoundInfo;
@@ -30,6 +32,8 @@ public class SoundBubble extends Component implements IDeathListener
 	private TextArea m_Popup;
 	private boolean m_Outline;
 	private Color m_OutlineColor;
+	private boolean m_IsColor;
+	private final ArrayList<Pulse> m_ActivePulses = new ArrayList<Pulse>();
 	
 	public SoundBubble(Main i_Parent, float i_Radius, Point i_Origin, String i_Category) 
 	{
@@ -98,35 +102,42 @@ public class SoundBubble extends Component implements IDeathListener
 		
 		
 		// Pulse if needed
-				if (this.m_Pulse)
-				{
-					// keep track of time
-					this.m_currentAnimationTime += ellapsedTime;
+		if (this.m_Pulse)
+		{
+			// keep track of time
+			this.m_currentAnimationTime += ellapsedTime;
 
-					// if number of active pulses is not max and enough time passed since last pulse
-					if (this.m_Pulses < this.m_numberOfPulses && this.m_spacingTime >= this.m_TimeBetweenPulses)
-					{
-						// create new pulse and increment number of active pulses
-						this.m_Pulses++;
+			// if number of active pulses is not max and enough time passed since last pulse
+			if (this.m_Pulses < this.m_numberOfPulses && this.m_spacingTime >= this.m_TimeBetweenPulses)
+			{
+				// create new pulse and increment number of active pulses
+				this.m_Pulses++;
 
-						// register for this pulses death event
-						new Pulse(new PVector(this.m_Origin.x, this.m_Origin.y), this.m_Radius, this.m_Color, 3500, this.m_Parent).addDeathListener(this);
+				// register for this pulses death event
+				Pulse p = new Pulse(new PVector(this.m_Origin.x, this.m_Origin.y), this.m_Radius, this.m_Color, 3500, this.m_Parent);
+				p.addDeathListener(this);
+				this.m_ActivePulses.add(p);
 
-						// reset time since pulse
-						this.m_spacingTime = 0;
-					} else
-					{
-						// no pulse created - increment time since pulse
-						this.m_spacingTime += ellapsedTime;
-					}
+				// reset time since pulse
+				this.m_spacingTime = 0;
+			} else
+			{
+				// no pulse created - increment time since pulse
+				this.m_spacingTime += ellapsedTime;
+			}
 
-					// If sound was active enough time stop animation and reset time
-					if (this.m_currentAnimationTime >= this.m_totalAnimationTime)
-					{
-						this.deactivate();
+			// If sound was active enough time stop animation and reset time
+			if (this.m_currentAnimationTime >= this.m_totalAnimationTime)
+			{
+				this.deactivate();
 
-					}
-				}
+			}
+		}
+		
+		for (Pulse pulse : this.m_ActivePulses)
+		{
+			pulse.setColor(this.m_IsColor ? this.m_Color : INACTIVE_COLOR);
+		}
 		
 	}
 
@@ -157,7 +168,8 @@ public class SoundBubble extends Component implements IDeathListener
 			this.m_Parent.noStroke();			
 		}
 		
-		this.m_Parent.fill(this.m_Color.getRGB());
+		Color color = this.m_IsColor ? this.m_Color : INACTIVE_COLOR;
+		this.m_Parent.fill(color.getRGB());
 		this.m_Parent.ellipse(this.m_Origin.x, this.m_Origin.y, this.m_Radius, this.m_Radius);
 				
 		if (this.m_MouseOver)
@@ -172,7 +184,9 @@ public class SoundBubble extends Component implements IDeathListener
 	@Override
 	public void handleDeath(Object object) 
 	{
-		this.m_Pulses--;		
+		this.m_Pulses--;
+		Pulse p = (Pulse) object;
+		this.m_ActivePulses.remove(p);
 	}
 
 	public void removeOutline() 
@@ -190,6 +204,17 @@ public class SoundBubble extends Component implements IDeathListener
 	public String getUser() {
 		
 		return this.m_SoundInfo.getUser();
+	}
+
+	public void colorize() 
+	{		
+		this.m_IsColor = true;
+	}
+
+	public void removeColor() 
+	{
+		this.m_IsColor = false;
+		
 	}
 
 }

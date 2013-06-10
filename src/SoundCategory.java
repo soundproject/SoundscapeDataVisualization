@@ -19,6 +19,7 @@ public class SoundCategory extends SelfRegisteringComponent
 	private boolean m_MouseOver;
 	private final ArrayList<SoundBubble> m_SoundBubbles = new ArrayList<SoundBubble>();
 	private Main m_Parent;
+	private boolean m_Active;
 	
 	
 	/**
@@ -158,18 +159,22 @@ public class SoundCategory extends SelfRegisteringComponent
 	@Override
 	public void update(long ellapsedTime) 
 	{
-		// check if mouse is inside the bounding rectangle of the cloud
-		if (this.m_BoundingRectangle.contains(new Point((int)this.m_Parent.getWorldMouse().x, (int)this.m_Parent.getWorldMouse().y)))
-		{
-			this.m_MouseOver = true;
-		} else
-		{
-			this.m_MouseOver = false;
-		}
+		// check if mouse is inside the bounding rectangle of the cloud		
+		this.m_MouseOver = this.m_BoundingRectangle.contains(new Point((int)this.m_Parent.getWorldMouse().x, 
+																	   (int)this.m_Parent.getWorldMouse().y));
+		
+		this.m_Active = m_MouseOver;
 		
 		for(SoundBubble bubble : this.m_SoundBubbles)
 		{
 			bubble.update(ellapsedTime);
+			if (m_MouseOver || m_Active)
+			{
+				bubble.colorize();
+			} else
+			{
+				bubble.removeColor();
+			}
 		}
 	}
 
@@ -205,6 +210,16 @@ public class SoundCategory extends SelfRegisteringComponent
 		this.m_Parent.textSize(35);
 		this.m_Parent.text(this.m_Name, (float)this.m_BoundingRectangle.getCenterX(), (float)this.m_BoundingRectangle.getCenterY());
 
+	}
+	
+	public void activate()
+	{
+		this.m_Active = true;
+	}
+	
+	public void deactivate()
+	{
+		this.m_Active = false;
 	}
 
 	private void drawGlow() 

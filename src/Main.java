@@ -53,6 +53,7 @@ public class Main extends ManagedPApplet
 	private String m_UserInput ="";
 	private boolean m_isZoomingOut;
 	private final ArrayList<SoundBubble> m_Sounds = new ArrayList<SoundBubble>();
+	private final ArrayList<SoundCategory> m_SoundCategories = new ArrayList<SoundCategory>();
 
 	public void setup()
 	{
@@ -121,7 +122,7 @@ public class Main extends ManagedPApplet
 			System.out.println("Translation is: " + dx + " " + dy + " for sound " + soundCategory.getName());
 			System.out.println("New topleft is " + topLeft.x + " " + topLeft.y);
 			
-			new SoundCategory(this, soundCategory.getName(), topLeft, cellSize);
+			this.m_SoundCategories .add(new SoundCategory(this, soundCategory.getName(), topLeft, cellSize));
 		}
 	}
 
